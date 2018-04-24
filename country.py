@@ -10,7 +10,7 @@ class Country:
         self.loc = loc
         self.e = e
         self.i = i
-        self.fitness = 0
+        self.fitness = self.m
         self.moves = []
         self.history = []
         self.strategy = strategy #a function (self, opponent, **kwargs) -> [C,D]

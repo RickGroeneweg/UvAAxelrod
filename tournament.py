@@ -33,6 +33,10 @@ def marker_color(country, string, change = 0):
     elif string == "change":
         return change
 
+def marker_style(string):
+    mydict = {"collaborate": "o", "defect": "v", "tit_for_tat": "s", "grudge": "x", "random_move": "D", "alternate": "*"}
+    return mydict[string]
+
 
 def draw_pie(ax, lat, lon, outcomeDict, size=600): #to do: adjust for any number of strategies, replace to a better location in the code
 
@@ -74,21 +78,28 @@ class TournamentRound:
         self.initialFitness = [c.fitness for c in self.countries]
         self.changeInFitness = []
 
-    def play(self, printing = True, turns = 12):
+    def play(self, printing = True, turns = 12, rounds=1, changingStrategy = False):
         all_combinations = list(combinations(range(len(self.countries)), 2)) #first one always lower
-        for (a, b) in all_combinations:
-            newGame = Game(self.countries[a], self.countries[b])
-            newMatch = Match(newGame, turns = turns)
-            newMatch.play(printing = printing)
-            self.matches[(a,b)] = newMatch
+        for _ in range(rounds):
+            for (a, b) in all_combinations:
+                newGame = Game(self.countries[a], self.countries[b])
+                newMatch = Match(newGame, turns = turns)
+                newMatch.play(printing = printing)
+                self.matches[(a,b)] = newMatch
+                #here we could also safe some information about this round
+
+            if changingStrategy:
+                self.change_a_strategy()
+
+            if printing: print("One round of tournament matches played")
 
         self.changeInFitness = [(a.fitness - b) for (a,b) in zip(self.countries, self.initialFitness)]
 
 
-        if printing: print("One round of tournament matches played")
 
 
-    def fitness_change_matrix(self, countryNames, indices):
+
+    def fitness_change_matrix(self, countryNames, indices): #This method does not work for rounds>1, only solution I see is geting a matrix as an attribute
         size = len(countryNames)
         assert(size == len(indices))
         result = np.zeros((size, size))
@@ -102,6 +113,24 @@ class TournamentRound:
                 (result[i,j],result[j,i]) = self.matches[(indexi, indexj)].changeInFitness
 
         return result
+
+    def change_a_strategy(self, printing = True):
+
+        N = len(self.countries)
+
+        total_fitness = sum([country.fitness for country in self.countries])
+        probabilities = [country.fitness/total_fitness for country in self.countries]
+        reproduce_index = np.random.choice(range(N), p=probabilities)
+
+        eliminate_index = np.random.randint(N)
+
+        losingCountry = self.countries[eliminate_index]
+        winningCountry = self.countries[reproduce_index]
+        losingStrategyStr = str(losingCountry.strategy)
+
+        losingCountry.strategy = winningCountry.strategy
+        if printing:
+            print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ " changed to strategy " + winningCountry.__str__() + " (" + str(winningCountry.strategy) + ")")
 
     def draw_round_robin_matrix(self, texting = True, selecting = [], filtering = [], decimals =2, cmap = 'CMRmap'):
         allCountryNames = [country.__str__() for country in self.countries]
@@ -184,6 +213,8 @@ class TournamentRound:
     def draw_country_marker(ax, country, svColor="out", svSize="m", factor = 1, change = 100, cmax = 0, cmin = 0):
         if svColor == "out":
             draw_pie(ax, country.loc[0], country.loc[1], country.outcomeDict, size = marker_size(country, svSize, factor, change = change))
+        elif svSize == "strat":
+            ax.scatter(country.loc[1], country.loc[0], marker = marker_style(str(country.strategy)), s = 3 * factor ,c = marker_color(country, svColor, change), cmap =plt.get_cmap('gnuplot'), vmax = cmax, vmin = cmin)
         else:
             #m.plot(country.loc[1], country.loc[0], 'ro', markersize = marker_size(markerSize, factor) ) #should be area in stead of radius
             ax.scatter(country.loc[1], country.loc[0], s= [marker_size(country, svSize, factor, change)], \

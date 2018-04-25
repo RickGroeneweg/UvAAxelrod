@@ -80,7 +80,7 @@ class TournamentRound:
 
     def play(self, printing = True, turns = 12, rounds=1, changingStrategy = False):
         all_combinations = list(combinations(range(len(self.countries)), 2)) #first one always lower
-        for _ in range(rounds):
+        for n in range(rounds):
             for (a, b) in all_combinations:
                 newGame = Game(self.countries[a], self.countries[b])
                 newMatch = Match(newGame, turns = turns)
@@ -89,9 +89,14 @@ class TournamentRound:
                 #here we could also safe some information about this round
 
             if changingStrategy:
-                self.change_a_strategy()
+                self.change_a_strategy(n+1, printing = printing)
 
             if printing: print("One round of tournament matches played")
+
+
+
+#            if endOfEvolution:
+#                print("process ended in {} rounds".format(n+1))
 
         self.changeInFitness = [(a.fitness - b) for (a,b) in zip(self.countries, self.initialFitness)]
 
@@ -114,7 +119,7 @@ class TournamentRound:
 
         return result
 
-    def change_a_strategy(self, printing = True):
+    def change_a_strategy(self, roundNum,  printing = True ):
 
         N = len(self.countries)
 
@@ -127,10 +132,59 @@ class TournamentRound:
         losingCountry = self.countries[eliminate_index]
         winningCountry = self.countries[reproduce_index]
         losingStrategyStr = str(losingCountry.strategy)
+        winningStrategyStr = str(winningCountry.strategy)
+
+        losingCountry.evolution.append((roundNum, winningStrategyStr))
 
         losingCountry.strategy = winningCountry.strategy
         if printing:
-            print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ " changed to strategy " + winningCountry.__str__() + " (" + str(winningCountry.strategy) + ")")
+            print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ " changed to strategy " + winningCountry.__str__() + " (" + winningStrategyStr + ")")
+
+    def draw_evo(self, rounds, cmap = 'CMRmap'):
+
+        valueDict = {"collaborate": 1, "defect": 2, "tit_for_tat": 3, "grudge": 4, "random_move": 5, "alternate": 6}
+        allCountryNames = [country.__str__() for country in self.countries]
+
+        matrix = self.make_evolution_matrix(self.countries, rounds)
+
+
+
+        fig, ax = plt.subplots()
+        im = ax.imshow(matrix, cmap =plt.get_cmap(cmap))
+
+        ax.set_xticks(np.arange(rounds))
+        ax.set_yticks(np.arange(len(allCountryNames)))
+
+        ax.set_xticklabels(range(rounds))
+        ax.set_yticklabels(allCountryNames)
+
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+
+        cb = fig.colorbar(im)
+        cb.set_label('strategies')
+        ax.set_title("Evolution")
+        fig.tight_layout()
+        plt.show()
+
+    @staticmethod
+    def make_evolution_matrix(countries, rounds):
+
+        valueDict = {"collaborate": 1, "defect": 2, "tit_for_tat": 3, "grudge": 4, "random_move": 5, "alternate": 6}
+        result = np.zeros((len(countries), rounds+1))
+
+        for country_index, country in enumerate(countries):
+            le = len(country.evolution)
+            for evo_nr in range(le-1):
+                value = valueDict[country.evolution[evo_nr][1]]
+                result[country_index, country.evolution[evo_nr][0]: country.evolution[evo_nr+1][0] ] = value
+            #laatste balk
+            last_value = valueDict[country.evolution[-1][1]]
+            result[country_index, country.evolution[-1][0]: ] =last_value
+
+        return result
+
+
+
 
     def draw_round_robin_matrix(self, texting = True, selecting = [], filtering = [], decimals =2, cmap = 'CMRmap'):
         allCountryNames = [country.__str__() for country in self.countries]

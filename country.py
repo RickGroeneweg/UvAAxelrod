@@ -15,6 +15,7 @@ class Country:
         self.history = []
         self.strategy = strategy #a function (self, opponent, **kwargs) -> [C,D]
         self.outcomeDict = {R: 0, T: 0, S: 0, P: 0}
+        self.evolution = [(0, str(self.strategy))]
 
     def __str__(self):
         return self.name

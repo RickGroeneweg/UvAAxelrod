@@ -44,3 +44,5 @@ tour = TournamentRound(netherlands, germany, uk, france, italy, sweden, denmark,
     india, us, canada, japan, russia, southAfrica, northKorea, southKorea, australia, newZealand, spain, \
     israel, ireland, finland, portugal, brazil, argentina, indonesia, pakistan, nigeria,\
     egypt, mexico, ethiopia)
+
+tourtje = TournamentRound(netherlands, southKorea, finland, newZealand)

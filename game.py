@@ -7,9 +7,11 @@ from geopy import distance
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 
-class Game:
+class Game
+    '''Here the values of payoff functions are stored'''
 
     def __init__(self, country1, country2):
+
         self.country1 = country1
         self.country2 = country2
 
@@ -32,6 +34,7 @@ class Game:
 
 
     def play(self):
+        '''returns moves the countries make, and update attributes'''
         move_country1 = self.country1.strategy(self.country1, self.country2) #*kwargs?
         move_country2 = self.country2.strategy(self.country2, self.country1)
 
@@ -51,6 +54,7 @@ class Game:
 
 
     def update_fitness(self, outcome_for_countr1):
+        '''updates the fitness of the two countries after a game'''
         if outcome_for_countr1 == Outcome.R:
             return (self.country1.fitness + self.reward1, self.country2.fitness + self.reward2)
         elif outcome_for_countr1 == Outcome.P:

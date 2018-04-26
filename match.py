@@ -3,6 +3,7 @@ from .game import *
 
 
 class Match:
+    '''A Match is a series of games between the same two countries, where the countries can react to the previous turns'''
 
     def __init__(self, game, turns=12):
         self.game = game
@@ -18,13 +19,14 @@ class Match:
 
 
     def play(self, printing = True):
+        '''plays a Match'''
         assert(self.game.country1.moves == [])
         assert(self.game.summary == [])
 
         for _ in range(self.turns):
             self.game.play()
 
-        if printing: print("match played:" + self.__str__())
+#        if printing: print("match played:" + self.__str__())
         self.changeInFitness = (self.game.country1.fitness - self.initialFitness[0], self.game.country2.fitness - self.initialFitness[1])
 
         self.summary = self.game.summary

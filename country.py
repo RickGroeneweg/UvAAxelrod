@@ -3,6 +3,7 @@ from .action import Outcome
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 
 class Country:
+    '''All features of countries are stored here'''
 
     def __init__(self, name, m, loc, e, i, strategy):
         self.name = name

@@ -11,6 +11,8 @@ from .match import *
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
+import matplotlib.patches as mpatches
+
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 
@@ -22,7 +24,7 @@ def marker_size(country ,string, factor, change = 0):
         return 1.128 * sqrt(country.fitness* factor)
     elif string == "change":
         return 1.128 * sqrt(change* factor)
-    else: raise Exception
+    else: raise Exception("keyword for marker size not implemented")
 
 
 def marker_color(country, string, change = 0):
@@ -70,33 +72,40 @@ def draw_pie(ax, lat, lon, outcomeDict, size=600): #to do: adjust for any number
     ax.scatter(lon, lat, marker = (xy3, 0), s=s3 **2 * size, facecolor = 'blue')
     ax.scatter(lon, lat, marker = (xy4, 0), s=s4 **2 * size, facecolor = 'black')
 
-class TournamentRound:
+class Tournament:
+    '''Here a tournament between all countries is played, consting of matches between all countries'''
 
     def __init__(self, *countries):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue
         self.initialFitness = [c.fitness for c in self.countries]
         self.changeInFitness = []
+        size = len(self.countries)
+        self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 12, rounds=1, changingStrategy = False):
+
+    def play(self, printing = True, turns = 12, rounds=1, changingStrategy = True):
+        '''plays the tournament'''
         all_combinations = list(combinations(range(len(self.countries)), 2)) #first one always lower
         for n in range(rounds):
             for (a, b) in all_combinations:
                 newGame = Game(self.countries[a], self.countries[b])
                 newMatch = Match(newGame, turns = turns)
                 newMatch.play(printing = printing)
-                self.matches[(a,b)] = newMatch
+                #self.matches[(a,b)] = newMatch
                 #here we could also safe some information about this round
+                (self.matchResultsMatrix[a, b], self.matchResultsMatrix[b, a]) = (newMatch.changeInFitness[0]+self.matchResultsMatrix[a, b], newMatch.changeInFitness[1]+self.matchResultsMatrix[b, a])
 
             if changingStrategy:
                 self.change_a_strategy(n+1, printing = printing)
 
-            if printing: print("One round of tournament matches played")
+            if printing: print("Round {} of tournament played".format(n+1))
 
 
 
 #            if endOfEvolution:
 #                print("process ended in {} rounds".format(n+1))
+#                break
 
         self.changeInFitness = [(a.fitness - b) for (a,b) in zip(self.countries, self.initialFitness)]
 
@@ -104,7 +113,8 @@ class TournamentRound:
 
 
 
-    def fitness_change_matrix(self, countryNames, indices): #This method does not work for rounds>1, only solution I see is geting a matrix as an attribute
+    def fitness_change_matrix(self, countryNames, indices): #This method is depricated and is going to be removed
+
         size = len(countryNames)
         assert(size == len(indices))
         result = np.zeros((size, size))
@@ -120,6 +130,7 @@ class TournamentRound:
         return result
 
     def change_a_strategy(self, roundNum,  printing = True ):
+        '''selects a random country to change it's strategy to a strategy of a country with a high fitness'''
 
         N = len(self.countries)
 
@@ -140,9 +151,10 @@ class TournamentRound:
         if printing:
             print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ " changed to strategy " + winningCountry.__str__() + " (" + winningStrategyStr + ")")
 
-    def draw_evo(self, rounds, cmap = 'CMRmap'):
+    def draw_evo(self, rounds):
+        '''draws for every country the evolution of its stategy'''
 
-        valueDict = {"collaborate": 1, "defect": 2, "tit_for_tat": 3, "grudge": 4, "random_move": 5, "alternate": 6}
+
         allCountryNames = [country.__str__() for country in self.countries]
 
         matrix = self.make_evolution_matrix(self.countries, rounds)
@@ -150,7 +162,7 @@ class TournamentRound:
 
 
         fig, ax = plt.subplots()
-        im = ax.imshow(matrix, cmap =plt.get_cmap(cmap))
+        im = ax.imshow(matrix)
 
         ax.set_xticks(np.arange(rounds))
         ax.set_yticks(np.arange(len(allCountryNames)))
@@ -160,16 +172,24 @@ class TournamentRound:
 
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 
-        cb = fig.colorbar(im)
-        cb.set_label('strategies')
+        # get the colors of the values, according to the
+        # colormap used by imshow
+        colors = [ im.cmap(im.norm(value)) for value in range(6)]
+        valueList = ["collaborate", "defect", "tit_for_tat", "grudge", "random_move", "alternate"]
+        # create a patch (proxy artist) for every color
+        patches = [ mpatches.Patch(color=colors[i], label=valueList[i] ) for i in range(len(valueList)) ]
+        # put those patched as legend-handles into the legend
+        plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=4, borderaxespad=0. )
+
         ax.set_title("Evolution")
         fig.tight_layout()
         plt.show()
 
     @staticmethod
     def make_evolution_matrix(countries, rounds):
+        '''helper function to draw_evo'''
 
-        valueDict = {"collaborate": 1, "defect": 2, "tit_for_tat": 3, "grudge": 4, "random_move": 5, "alternate": 6}
+        valueDict = {"collaborate": 0, "defect": 1, "tit_for_tat": 2, "grudge": 3, "random_move": 4, "alternate": 5}
         result = np.zeros((len(countries), rounds+1))
 
         for country_index, country in enumerate(countries):
@@ -186,7 +206,8 @@ class TournamentRound:
 
 
 
-    def draw_round_robin_matrix(self, texting = True, selecting = [], filtering = [], decimals =2, cmap = 'CMRmap'):
+    def draw_round_robin_matrix(self, texting = False, selecting = [], filtering = [], decimals =2, cmap = 'CMRmap'):
+        '''draws a matrix where for every country the amount of change in fitness due to every other country is drawn'''
         allCountryNames = [country.__str__() for country in self.countries]
         if selecting:
             countryNames = selecting
@@ -197,7 +218,7 @@ class TournamentRound:
 
         indices = [allCountryNames.index(cn) for cn in countryNames]
 
-        matrix = self.fitness_change_matrix(countryNames, indices)
+        matrix = self.matchResultsMatrix #self.fitness_change_matrix(countryNames, indices)
 
         fig, ax = plt.subplots()
         im = ax.imshow(matrix, cmap =plt.get_cmap(cmap))
@@ -223,6 +244,7 @@ class TournamentRound:
         plt.show()
 
     def draw_geo(self, factor = 50, resol = 'c', svColor = "out", svSize = "m", projection = 'cyl'): #sv for state variable
+        '''draws a world map with all participating coutnries'''
         fig, ax = plt.subplots()
 
         m = Basemap(projection=projection,llcrnrlat=-60,urcrnrlat=75,\
@@ -265,6 +287,7 @@ class TournamentRound:
 
     @staticmethod
     def draw_country_marker(ax, country, svColor="out", svSize="m", factor = 1, change = 100, cmax = 0, cmin = 0):
+        '''helper function to draw_geo'''
         if svColor == "out":
             draw_pie(ax, country.loc[0], country.loc[1], country.outcomeDict, size = marker_size(country, svSize, factor, change = change))
         elif svSize == "strat":

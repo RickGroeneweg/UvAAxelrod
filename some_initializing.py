@@ -40,7 +40,7 @@ ethiopia = Country("Ethiopia", 100, AddisAbaba, 0.1,0.1, alternate)
 
 
 
-tour = TournamentRound(netherlands, germany, uk, france, italy, sweden, denmark, belgium, china, \
+tour = Tournament(netherlands, germany, uk, france, italy, sweden, denmark, belgium, china, \
     india, us, canada, japan, russia, southAfrica, northKorea, southKorea, australia, newZealand, spain, \
     israel, ireland, finland, portugal, brazil, argentina, indonesia, pakistan, nigeria,\
     egypt, mexico, ethiopia)

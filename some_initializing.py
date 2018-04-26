@@ -45,4 +45,4 @@ tour = Tournament(netherlands, germany, uk, france, italy, sweden, denmark, belg
     israel, ireland, finland, portugal, brazil, argentina, indonesia, pakistan, nigeria,\
     egypt, mexico, ethiopia)
 
-tourtje = TournamentRound(netherlands, southKorea, finland, newZealand)
+tourtje = Tournament(netherlands, southKorea, finland, newZealand)

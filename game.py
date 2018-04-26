@@ -7,7 +7,7 @@ from geopy import distance
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 
-class Game
+class Game:
     '''Here the values of payoff functions are stored'''
 
     def __init__(self, country1, country2):

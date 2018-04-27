@@ -77,7 +77,7 @@ class Tournament:
 
     def __init__(self, *countries):
         self.countries = list(countries)
-        self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue
+        self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.initialFitness = [c.fitness for c in self.countries]
         self.changeInFitness = []
         size = len(self.countries)
@@ -87,14 +87,17 @@ class Tournament:
     def play(self, printing = True, turns = 12, rounds=1, changingStrategy = True):
         '''plays the tournament'''
         all_combinations = list(combinations(range(len(self.countries)), 2)) #first one always lower
+        for (a, b) in all_combinations:
+            newGame = Game(self.countries[a], self.countries[b])
+            newMatch = Match(newGame)
+            self.matches[(a,b)]= newMatch
+
+
         for n in range(rounds):
-            for (a, b) in all_combinations:
-                newGame = Game(self.countries[a], self.countries[b])
-                newMatch = Match(newGame, turns = turns)
-                newMatch.play(printing = printing)
-                #self.matches[(a,b)] = newMatch
-                #here we could also safe some information about this round
-                (self.matchResultsMatrix[a, b], self.matchResultsMatrix[b, a]) = (newMatch.changeInFitness[0]+self.matchResultsMatrix[a, b], newMatch.changeInFitness[1]+self.matchResultsMatrix[b, a])
+
+            for (a,b), match in self.matches.items():
+                match.play(turns = 12)
+                (self.matchResultsMatrix[a, b], self.matchResultsMatrix[b, a]) = (self.matchResultsMatrix[a, b]+match.changeInFitness[0], self.matchResultsMatrix[b, a]+ match.changeInFitness[1])
 
             if changingStrategy:
                 self.change_a_strategy(n+1, printing = printing)
@@ -109,25 +112,6 @@ class Tournament:
 
         self.changeInFitness = [(a.fitness - b) for (a,b) in zip(self.countries, self.initialFitness)]
 
-
-
-
-
-    def fitness_change_matrix(self, countryNames, indices): #This method is depricated and is going to be removed
-
-        size = len(countryNames)
-        assert(size == len(indices))
-        result = np.zeros((size, size))
-
-        #this for-loop is a bit complex...
-        for i in range(size-1):
-            for j in range(i+1, size):
-                indexi = indices[i]
-                indexj = indices[j]
-                if indexi > indexj: (indexi, indexj) = (indexj, indexi); (i,j)=(j,i) #this is needed if we select on countries
-                (result[i,j],result[j,i]) = self.matches[(indexi, indexj)].changeInFitness
-
-        return result
 
     def change_a_strategy(self, roundNum,  printing = True ):
         '''selects a random country to change it's strategy to a strategy of a country with a high fitness'''
@@ -206,19 +190,21 @@ class Tournament:
 
 
 
-    def draw_round_robin_matrix(self, texting = False, selecting = [], filtering = [], decimals =2, cmap = 'CMRmap'):
+    def draw_round_robin_matrix(self, texting = False, selecting = [], filtering = [], decimals =2, cmap = 'gnuplot'):
         '''draws a matrix where for every country the amount of change in fitness due to every other country is drawn'''
         allCountryNames = [country.__str__() for country in self.countries]
         if selecting:
-            countryNames = selecting
+            countryNames = [country.__str__() for country in selecting]
         elif filtering:
-            countryNames = [country.__str__() for country in self.countries if country.__str__() not in filtering ]
+            countryNames = [country.__str__() for country in self.countries if country not in filtering ]
         else:
             countryNames = allCountryNames
 
+        print(countryNames)
         indices = [allCountryNames.index(cn) for cn in countryNames]
+        print(indices)
 
-        matrix = self.matchResultsMatrix #self.fitness_change_matrix(countryNames, indices)
+        matrix = self.matchResultsMatrix[indices, :][:, indices] #matrix with only rows and columns of indexed countries
 
         fig, ax = plt.subplots()
         im = ax.imshow(matrix, cmap =plt.get_cmap(cmap))
@@ -270,6 +256,7 @@ class Tournament:
             cmin = 0 # not needed
 
 
+
         for i, country in enumerate(self.countries):
             self.draw_country_marker(ax, country, svColor, svSize, factor = factor, change = self.changeInFitness[i], cmax=cmax, cmin = cmin)
 
@@ -278,6 +265,11 @@ class Tournament:
             sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=cmin, vmax=cmax))
             sm._A = []
             plt.colorbar(sm)
+        elif svSize == "strat":
+            legendKeys = [plt.plot(1, "r"+i, markersize = 100) for i in ["o", "v", "s", "x", "D", "*"]]
+            legendLabels = ["collaborate", "defect", "tit_for_tat", "grudge", "random_move", "alternate"]
+            plt.legend(legendKeys, legendLabels)
+
         #sc = ax.scatter([],[], cmap = cmap, vmin = cmin, vmax = cmax)
         #cb = fig.colorbar(sc)
         #cb.set_label('change in fitness')
@@ -291,7 +283,9 @@ class Tournament:
         if svColor == "out":
             draw_pie(ax, country.loc[0], country.loc[1], country.outcomeDict, size = marker_size(country, svSize, factor, change = change))
         elif svSize == "strat":
-            ax.scatter(country.loc[1], country.loc[0], marker = marker_style(str(country.strategy)), s = 3 * factor ,c = marker_color(country, svColor, change), cmap =plt.get_cmap('gnuplot'), vmax = cmax, vmin = cmin)
+            mymarker = marker_style(str(country.strategy))
+            mylabel = str(country.strategy)
+            ax.scatter(country.loc[1], country.loc[0], marker = mymarker, label = mylabel, s = 3 * factor ,c = marker_color(country, svColor, change), cmap =plt.get_cmap('gnuplot'), vmax = cmax, vmin = cmin)
         else:
             #m.plot(country.loc[1], country.loc[0], 'ro', markersize = marker_size(markerSize, factor) ) #should be area in stead of radius
             ax.scatter(country.loc[1], country.loc[0], s= [marker_size(country, svSize, factor, change)], \

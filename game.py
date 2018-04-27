@@ -27,13 +27,13 @@ class Game:
         self.punishment1 = punishment(self.country1, self.country2,self.distance)
         self.punishment2 = punishment(self.country1, self.country2,self.distance)
 
-        self.summary = [] #summerizes the moves the two countries made for every time self.play(<...>) was called
+
 
     def __str__(self):
         return self.country1.name + " vs " + self.country2.name
 
 
-    def play(self):
+    def play(self): #should not change the game object except for its countries.
         '''returns moves the countries make, and update attributes'''
         move_country1 = self.country1.strategy(self.country1, self.country2) #*kwargs?
         move_country2 = self.country2.strategy(self.country2, self.country1)
@@ -41,7 +41,7 @@ class Game:
         outcome = to_outcome(move_country1, move_country2)
         self.country1.outcomeDict[outcome[0]] += 1
         self.country2.outcomeDict[outcome[1]] += 1
-        self.summary.append((move_country1, move_country2))
+
 
         self.country1.moves.append(move_country1)
         self.country2.moves.append(move_country2)

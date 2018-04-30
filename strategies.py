@@ -4,44 +4,46 @@ import random
 import functools
 
 C, D = Action.C, Action.D
+Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate
 
-def give_str (string):
-    '''A decorator function, that adds a __str__ method to a function object (like a strategy)'''
-    def function_with_str(f_without):
-        class StrFunction:
+
+def give_strat (strat):
+    '''A decorator function, that adds a Strat (Enum) method to a function object (like a strategy)'''
+    def function_with_strat(f_without):
+        class Function_w_name:
             def __call__(self, *args, **kwargs):
                 #return behaviour of function unchanged
                 return f_without(*args, **kwargs)
-            def __str__(self):
-                return string
-        return functools.wraps(function_with_str)(StrFunction())
-    return function_with_str
+            def name(self):
+                return strat
+        return functools.wraps(function_with_strat)(Function_w_name())
+    return function_with_strat
 
-@give_str("collaborate")
+@give_strat(Collaborate)
 def collaborate(country1, country2):
     '''Only collaborates'''
     return C
 
-@give_str("defect")
+@give_strat(Defect)
 def defect(country1, country2):
     '''Only defects'''
     return D
 
-@give_str("tit_for_tat")
+@give_strat(TitForTat)
 def tit_for_tat(country1, country2):
-    '''Starts the match by Colaborating, then plays the move the opponent played last turn'''
+    '''Starts the match by collaborating, then plays the move the opponent played last turn'''
     if country2.moves == []: # not country2.moves more efficient, but needs checking
         return C
     else: return country2.moves[-1]
 
-@give_str("grudge")
+@give_strat(Grudge)
 def grudge(country1, country2):
     '''Starts collaborating, but once the opponent defects, it will defect for the rest of the match'''
     if country1.moves == [] or country2.moves == []: return C
     elif country2.moves[-1] == D or country1.moves[-1] == D:
         return D
     else: return C
-@give_str("random_move")
+@give_strat(RandomMove)
 def random_move(country1, country2):
     '''returns a random move with uniform distribution'''
     rnd = random.getrandbits(1)
@@ -49,9 +51,9 @@ def random_move(country1, country2):
         return C
     else: return D
 
-@give_str("alternate")
+@give_strat(Alternate)
 def alternate(country1, country2):
-    '''switches between collaborating dan defecting'''
+    '''alternates between collaborating dan defecting'''
     if country1.moves == []:
         return C
     elif country1.moves[-1] == C:

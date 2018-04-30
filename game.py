@@ -7,6 +7,13 @@ from geopy import distance
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 
+class SelfGame:
+    def __init__(self, country):
+        self.country = country
+        self.reward = reward(self.country, self.country, 1000)
+    def play(self):
+        self.country.fitness = self.country.fitness + self.reward
+
 class Game:
     '''Here the values of payoff functions are stored'''
 
@@ -27,13 +34,11 @@ class Game:
         self.punishment1 = punishment(self.country1, self.country2,self.distance)
         self.punishment2 = punishment(self.country1, self.country2,self.distance)
 
-
-
     def __str__(self):
         return self.country1.name + " vs " + self.country2.name
 
 
-    def play(self): #should not change the game object except for its countries.
+    def play(self): #should this function really return something
         '''returns moves the countries make, and update attributes'''
         move_country1 = self.country1.strategy(self.country1, self.country2) #*kwargs?
         move_country2 = self.country2.strategy(self.country2, self.country1)

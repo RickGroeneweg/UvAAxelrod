@@ -1,6 +1,22 @@
 
 from .game import *
 
+class SelfMatch:
+    def __init__(self, selfgame):
+        self.selfgame = selfgame
+        self.changeInFitness = 0
+    ##__str__
+
+    def play(self, turns = 12):
+        initialFitness = self.selfgame.country.fitness
+
+        for _ in range(turns):
+            self.selfgame.play()
+
+        self.changeInFitness = self.selfgame.country.fitness - initialFitness
+
+        self.selfgame.country.moves = []
+
 
 class Match:
     '''A Match is a series of games between the same two countries, where the countries can react to the previous turns'''
@@ -15,7 +31,7 @@ class Match:
         return "<" + self.game.__str__() + " " + str(self.turns) + " turns>"
 
 
-    def play(self, printing = True, turns = 12): #only changes the players and cahngeinfitness
+    def play(self, printing = False, turns = 12): #only changes the players and cahngeinfitness
         '''plays a Match'''
         assert(self.game.country1.moves == [])
         initialFitness = (self.game.country1.fitness, self.game.country2.fitness)
@@ -25,7 +41,7 @@ class Match:
             self.game.play()
 
 
-#        if printing: print("match played:" + self.__str__())
+        if printing: print("match played:" + self.__str__())
         self.changeInFitness = (self.game.country1.fitness - initialFitness[0], self.game.country2.fitness - initialFitness[1])
 
 

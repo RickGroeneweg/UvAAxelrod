@@ -1,6 +1,6 @@
 from .country import *
 from geopy import distance
-
+from math import sqrt
 
 def reward(country, other, d):
     '''calculates how much reward would change fitness'''

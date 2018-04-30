@@ -184,11 +184,25 @@ class Tournament:
         mydict = {Collaborate: 0, Defect:1, TitForTat:2, Grudge: 3, RandomMove:4, Alternate: 5}
 
         for country in self.countries:
-            for (n, stat) in country.evolution:
+            for i, (n, stat) in enumerate(country.evolution[:-1]):
                 row = mydict[stat]
-                column = 0
+                next_n = country.evolution[i+1][0]
                 matrix[row, n:next_n] += country.m
-                
+            #to do: last line
+            last_evo, last_strategy = country.evolution[-1]
+            row = mydict[last_strategy]
+            matrix[row, last_evo:] += country.m
+
+
+        stack = np.vstack(matrix)
+
+        labels = ["col ", "def", "tit", "gru", "ran", "alt"]
+
+        fig, ax = plt.subplots()
+        ax.stackplot(range(rounds), matrix[0,:], matrix[1,:], matrix[2,:], matrix[3,:], matrix[4,:], matrix[5,:], labels=labels)
+        ax.legend(loc=2)
+        plt.show()
+
 
 
 

@@ -180,7 +180,7 @@ class Tournament:
     def draw_stack(self, rounds):
         numberOfStrategies = 6
         numberOfRounds = rounds
-        matrix = np.zeros((numberOfStrategies, numberOfRounds))
+        matrix = np.zeros((numberOfStrategies, numberOfRounds+1))
         mydict = {Collaborate: 0, Defect:1, TitForTat:2, Grudge: 3, RandomMove:4, Alternate: 5}
 
         for country in self.countries:
@@ -199,7 +199,7 @@ class Tournament:
         labels = ["col ", "def", "tit", "gru", "ran", "alt"]
 
         fig, ax = plt.subplots()
-        ax.stackplot(range(rounds), matrix[0,:], matrix[1,:], matrix[2,:], matrix[3,:], matrix[4,:], matrix[5,:], labels=labels)
+        ax.stackplot(range(rounds+1), matrix[0,:], matrix[1,:], matrix[2,:], matrix[3,:], matrix[4,:], matrix[5,:], labels=labels)
         ax.legend(loc=2)
         plt.show()
 

@@ -43,6 +43,7 @@ def grudge(country1, country2):
     elif country2.moves[-1] == D or country1.moves[-1] == D:
         return D
     else: return C
+
 @give_strat(RandomMove)
 def random_move(country1, country2):
     '''returns a random move with uniform distribution'''

@@ -194,7 +194,7 @@ class Tournament:
         matrix = np.zeros((numberOfStrategies, numberOfRounds+1))
         #mydict = {Collaborate: 0, Defect:1, TitForTat:2, Grudge: 3, RandomMove:4, Alternate: 5}
 
-        cmap = plt.get_cmap('jet')
+        cmap = plt.get_cmap(cmap)
         colors = [cmap(value/5) for value in range(6)]
 
         for country in self.countries:

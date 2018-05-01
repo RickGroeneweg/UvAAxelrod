@@ -37,6 +37,10 @@ def marker_color(country, string, change = 0):
         return country.fitness
     elif string == "change":
         return change
+    elif string == "strat":
+        raise Exception("strat not impemented as colorIndicator")
+    else:
+        raise Exception("colorIndicator not impemented")
 
 def marker_style(strat):
     mydict = {Collaborate: "o", Defect: "v", TitForTat: "s", Grudge: "x", RandomMove: "D", Alternate: "*"}
@@ -78,10 +82,12 @@ def draw_pie(ax, lat, lon, outcomeDict, size=600): #to do: adjust for any number
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
 
-    def __init__(self, *countries, initialFitnessEqualsM = True):
+    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 2000):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []
+        self.rounds = rounds
+
 
         if initialFitnessEqualsM:
             for country in self.countries:
@@ -96,7 +102,7 @@ class Tournament:
         self.strategyList = [Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate]
 
 
-    def play(self, printing = True, turns = 12, rounds=1, changingStrategy = True, playingThemselves = False):
+    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False):
         '''plays the tournament'''
 
         #we initialize the rewards countries get from there own internal market
@@ -117,7 +123,7 @@ class Tournament:
 
 
         #now the tournament starts
-        for n in range(rounds):
+        for n in range(self.rounds):
 
             #first countries get rewards from there own internal market
             if playingThemselves:
@@ -143,6 +149,7 @@ class Tournament:
 
             if self.endOfEvolution(self.countries):
                 print("The Process ended in {} rounds\n Winning strategy: {}".format(n+1, str(self.countries[0].strategy.name())))
+                self.rounds = n+1 #is the +1 correct? need to test
                 break;
 
         self.changeInFitness = [(a.fitness - b) for (a,b) in zip(self.countries, self.initialFitness)]
@@ -178,7 +185,10 @@ class Tournament:
         if printing:
             print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ "changed to strategy " + winningCountry.__str__() + " (" + winningStrategyStr + ")")
 
-    def draw_stack(self, rounds, cmap = 'jet'):
+    def draw_stack(self, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
+        if rounds ==0:
+            rounds = self.rounds
+
         numberOfStrategies = 6
         numberOfRounds = rounds
         matrix = np.zeros((numberOfStrategies, numberOfRounds+1))
@@ -202,7 +212,7 @@ class Tournament:
         stack = np.vstack(matrix)
 
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize =(xSize, ySize))
         ax.stackplot(range(rounds+1), matrix[0,:], matrix[1,:], matrix[2,:], matrix[3,:], matrix[4,:], matrix[5,:], labels=self.strategyList, colors= colors)
         ax.legend(loc=2)
         plt.ylabel('Market share')
@@ -255,9 +265,10 @@ class Tournament:
 
 
 
-    def draw_evo(self, rounds, cmap = 'jet' ):
+    def draw_evo(self, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40):
         '''draws for every country the evolution of its stategy'''
-
+        if rounds ==0:
+            rounds = self.rounds
 
         allCountryNames = [country.__str__() for country in self.countries]
 
@@ -265,13 +276,13 @@ class Tournament:
 
 
 
-        fig, ax = plt.subplots()
-        im = ax.imshow(matrix, cmap =plt.get_cmap(cmap))
+        fig, ax = plt.subplots(figsize=(xSize, ySize))
+        im = ax.imshow(matrix, cmap =plt.get_cmap(cmap), aspect='auto')
 
-        ax.set_xticks(np.arange(rounds))
+        #ax.set_xticks(np.arange(rounds))
         ax.set_yticks(np.arange(len(allCountryNames)))
 
-        ax.set_xticklabels(range(rounds))
+        #ax.set_xticklabels(range(rounds))
         ax.set_yticklabels(allCountryNames)
 
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
@@ -285,7 +296,7 @@ class Tournament:
         plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=5, borderaxespad=0. )
 
         ax.set_title("Evolution")
-        fig.tight_layout()
+        #fig.tight_layout()
         plt.show()
 
     @staticmethod
@@ -316,7 +327,7 @@ class Tournament:
         else:
             countryNames = allCountryNames
 
-    def draw_round_robin_matrix(self, texting = False, selecting = [], filtering = [], decimals =2, cmap = 'gnuplot'):
+    def draw_round_robin_matrix(self, texting = False, selecting = [], filtering = [], decimals =2, cmap = 'gnuplot', xSize = 20, ySize=20):
         '''draws a matrix where for every country the amount of change in fitness due to every other country is drawn'''
 
         #this should be a helper method using variables: selecting, filtering
@@ -337,7 +348,7 @@ class Tournament:
 
         matrix = self.matchResultsMatrix[indices, :][:, indices] #matrix with only rows and columns of indexed countries
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(xSize, ySize))
         im = ax.imshow(matrix, cmap =plt.get_cmap(cmap))
 
         ax.set_xticks(np.arange(len(countryNames)))
@@ -360,16 +371,8 @@ class Tournament:
         fig.tight_layout()
         plt.show()
 
-    def draw_geo(self, factor = 50, resol = 'c', colorIndicator = "out", sizeIndicator = "m", projection = 'cyl'): #sv for state variable
-        '''draws a world map with all participating coutnries'''
-        fig, ax = plt.subplots()
-
-        m = Basemap(projection=projection,llcrnrlat=-60,urcrnrlat=75,\
-                    llcrnrlon=-110,urcrnrlon=180, ax = ax)
-        m.drawcoastlines(zorder = 0)
-        m.drawcountries(linewidth=0.5, zorder = 0)
-
-        #colorbar preparation:
+    @staticmethod
+    def colorbarMinAndMax(colorIndicator):
         if colorIndicator != "out":
             if colorIndicator == "m":
                 lijst = [country.m for country in self.countries]
@@ -388,8 +391,19 @@ class Tournament:
         else:
             cmax = 0
             cmin = 0 # variable not needed
+        return (cmin, cmax)
 
+    def draw_geo(self, factor = 50, resol = 'c', colorIndicator = "out", sizeIndicator = "m", projection = 'cyl'): #sv for state variable
+        '''draws a world map with all participating coutnries'''
+        fig, ax = plt.subplots()
 
+        m = Basemap(projection=projection,llcrnrlat=-60,urcrnrlat=75,\
+                    llcrnrlon=-110,urcrnrlon=180, ax = ax)
+        m.drawcoastlines(zorder = 0)
+        m.drawcountries(linewidth=0.5, zorder = 0)
+
+        #colorbar preparation:
+        cmin, cmax = self.colorbarMinAndMax(colorIndicator)
 
         for i, country in enumerate(self.countries):
             self.draw_country_marker(ax, country, colorIndicator, sizeIndicator, factor = factor, change = self.changeInFitness[i], cmax=cmax, cmin = cmin)

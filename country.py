@@ -23,9 +23,9 @@ class Country:
     def __str__(self):
         return self.name
 
-    @classmethod
-    def Country_w_random_strategy(cls, strategies = []):
-        pass
+    def init_strategy(self, strategy):
+        self.strategy = strategy
+        self.evolution = [(0,self.strategy.name())]
 
     def country_reset(self, initFitness=0):
         self.fitness = initialFitness

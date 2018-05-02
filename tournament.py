@@ -185,6 +185,11 @@ class Tournament:
         if printing:
             print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ "changed to strategy " + winningCountry.__str__() + " (" + winningStrategyStr + ")")
 
+    @staticmethod
+    def init_strategy(strategy, *countries):
+        for country in countries:
+            country.init_strategy(strategy)
+
     def draw_stack(self, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
         if rounds ==0:
             rounds = self.rounds
@@ -214,7 +219,7 @@ class Tournament:
 
         fig, ax = plt.subplots(figsize =(xSize, ySize))
         ax.stackplot(range(rounds+1), matrix[0,:], matrix[1,:], matrix[2,:], matrix[3,:], matrix[4,:], matrix[5,:], labels=self.strategyList, colors= colors)
-        ax.legend(loc=2)
+        ax.legend(loc=5)
         plt.ylabel('Market share')
         plt.xlabel('Round number')
         plt.show()

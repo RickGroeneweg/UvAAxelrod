@@ -101,8 +101,23 @@ class Tournament:
         self.matchResultsMatrix = np.zeros((size, size))
         self.strategyList = [Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate]
 
+    def reset_after_tournament(self):
+        for country in self.countries:
+            country.reset_after_tournament(collaborate)
+        self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
+        self.selfMatches = []
+        if initialFitnessEqualsM:
+            for country in self.countries:
+                country.fitness = country.m
+                country.fitnessHistory = [country.fitness]
+        self.initialFitness = [c.fitness for c in self.countries]
 
-    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False):
+        self.changeInFitness = []
+
+        size = len(self.countries)
+        self.matchResultsMatrix = np.zeros((size, size))
+
+    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1):
         '''plays the tournament'''
 
         #we initialize the rewards countries get from there own internal market
@@ -138,7 +153,8 @@ class Tournament:
 
 
             if changingStrategy:
-                self.change_a_strategy(n+1, printing = printing)
+                for _ in range(nrStrategyChanges):
+                    self.change_a_strategy(n+1, printing = printing)
 
             for country in self.countries:
                 country.fitnessHistory.append(country.fitness)
@@ -168,8 +184,13 @@ class Tournament:
 
         N = len(self.countries)
 
-        total_fitness = sum([country.fitness for country in self.countries])
-        probabilities = [country.fitness/total_fitness for country in self.countries]
+        #probabilites cannot be negative, so all negative fitnesses are pretended to be 0
+        fitnessScores= [0 if country.fitness<0 else country.fitness for country in self.countries]
+
+        total_fitness = sum(fitnessScores)
+
+        probabilities = [fitnessScores[i]/total_fitness for i in range(N)]
+
         reproduce_index = np.random.choice(range(N), p=probabilities)
 
         eliminate_index = np.random.randint(N)
@@ -376,8 +397,8 @@ class Tournament:
         fig.tight_layout()
         plt.show()
 
-    @staticmethod
-    def colorbarMinAndMax(colorIndicator):
+
+    def colorbarMinAndMax(self, colorIndicator):
         if colorIndicator != "out":
             if colorIndicator == "m":
                 lijst = [country.m for country in self.countries]

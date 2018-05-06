@@ -10,7 +10,7 @@ R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 class SelfGame:
     def __init__(self, country):
         self.country = country
-        self.reward = reward(self.country, self.country, 1000)
+        self.reward = reward(self.country, self.country, 1000) #distance of a country and itself?
     def play(self):
         self.country.fitness = self.country.fitness + self.reward
 

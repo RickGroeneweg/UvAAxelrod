@@ -18,18 +18,18 @@ belgium = Country("Belgium",466.366,Brussels,0.754772003,0.03,collaborate,  174.
 belize = Country("Belize",1.765,Belmopan,0.138243626,0.192,collaborate,  151.56)
 benin = Country("Benin",8.583,PortoNovo,0.047419317,0.136,collaborate,  338.76)
 boliva = Country("Bolivia",33.806,LaPaz,0.269182985,0.09,collaborate,  1048.13)
-#botswana = Country("")
+#botswana = Country("Missing Data")
 brazil = Country("Brazil",1796.186,Brasilia,0.101325809,0.104,collaborate, 2918.18)
 brunei = Country("Brunei Darussalam",11.4,BandarSeriBegawan,0.557017544,0.012,collaborate,  75.96)
 bulgaria = Country("Bulgaria",52.395,Sofia,0.475236187,0.03,collaborate,  333.17)
 burkina = Country("Burkina Faso",12.115,Ouagadougou,0.291374329,0.093,collaborate,  523.66)
 burundi = Country("Burundi",3.007,Bujumbura,0.054871965,0.106,collaborate,  166.82)
 cambodia = Country("Cambodia",20.017,PhnomPenh,0.499575361,0.093,collaborate,  425.49)
-cameroon = Country("Cameroon", 24.204,Yaounde,0.195422244, 0.151,  689.52)
+cameroon = Country("Cameroon", 24.204,Yaounde,0.195422244, 0.151,collaborate, 689.52)
 canada = Country("Canada",1529.76,Ottawa,0.25298086,0.031,collaborate,  3159.85)
 capeverde = Country("Cape Verde",1.617,Praia,0.372912801,0.116,collaborate,  63.48)
 centralar = Country("Central African Republic",1.756,Bangui,0.08428246,0.184,collaborate,  789.29)
-chad = Country("Chad", 9.601, NDjamena, 0.212477867, 0.151,  1133.14)
+chad = Country("Chad", 9.601, NDjamena, 0.212477867, 0.151,collaborate,  1133.14)
 chile = Country("Chile",247.028,Santiago,0.23681526,0.059,collaborate,  869.54)
 china = Country("China",11199.145,Beijing,0.183942613,0.044,collaborate,  3092.40)
 colombia = Country("Colombia",282.463,Bogota,0.106916658,0.063,collaborate,  1068.53)
@@ -42,7 +42,7 @@ czechia = Country("Czech Republic",192.925,Prague,0.829337826,0.03,collaborate, 
 #drCongo = Country("Democratic Republic of Congo", 34.999,Kinshasa, 0.162576074, )
 denmark = Country("Denmark",306.143,Copenhagen,0.267848685,0.03,collaborate,  207.18)
 #djibouti
-dominica = Country("Dominica",0.525,Roseau, 0.15428571, 0.143, 27.38612788)
+dominica = Country("Dominica",0.525,Roseau, 0.15428571, 0.143,collaborate, 27.38612788)
 dominicanr = Country("Dominican Republic",71.584,SantoDomingo,0.121814931,0.076,collaborate,  220.61)
 ecuador = Country("Ecuador",97.802,Quito,0.171775628,0.094,collaborate,  506.33)
 egypt = Country("Egypt",336.297,Cairo,0.06660779,0.106,collaborate,  1000.72)
@@ -103,7 +103,7 @@ morocco = Country("Morocco",101.445,Rabat,0.222780817,0.093,collaborate,  668.24
 mozambique = Country("Mozambique",11.015,Maputo,0.550158874,0.069,collaborate,  894.08)
 #myanmar
 #namibia
-nepal = Country("Nepal",21.144,Kathmandu,0.042990919,0.122,collaborate  383.64)
+nepal = Country("Nepal",21.144,Kathmandu,0.042990919,0.122,collaborate, 383.64)
 netherlands = Country("Netherlands",777.227,Amsterdam,0.559682049,0.03,collaborate,  203.81)
 newzealand = Country("New Zealand",185.017,Wellington,0.175659534,0.025,collaborate,  517.41)
 nicaragua = Country("Nicaragua",13.231,Managua,0.393772202,0.06,collaborate,  361.07)
@@ -176,4 +176,6 @@ kyrgyzystan,latvia ,lithuania,macau ,madagascar,malawi,malaysia,malta ,mauritani
 montenegro,morocco ,mozambique,nepal ,netherlands,newzealand ,nicaragua,niger ,nigeria,norway,oman ,pakistan,panama ,paraguay,peru ,philippines,poland,portugal,
 qatar ,macedonia,congo ,romania,russia ,rwanda ,saintlucia ,saintvincent,samoa ,saudiarabia,senegal,seychelles,singapore ,
 slovakia ,slovenia ,solomonislands,southafrica,southkorea,spain,srilanka,sweden ,switzerland,tanzania ,thailand ,togo ,
+tongo,tunisia,turkey,uganda,ukraine,unitedarab,unitedkingdom,unitedstates,uruguay ,vietnam ,yemen ,zambia ,zimbabwe ]
+
 tongo,tunisia,turkey,uganda,ukraine,unitedarab,unitedkingdom,unitedstates,uruguay ,vietnam ,yemen ,zambia ,zimbabwe ]

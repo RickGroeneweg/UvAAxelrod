@@ -6,7 +6,7 @@ R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 class Country:
     '''All features of countries are stored here'''
 
-    def __init__(self, name, m, loc, e, i, strategy):
+    def __init__(self, name, m, loc, e, i, strategy, area):
         self.name = name
         self.m = m
         self.loc = loc
@@ -17,6 +17,7 @@ class Country:
         self.moves = []
         self.history = []
         self.strategy = strategy #a function (self, opponent, **kwargs) -> [C,D]
+        self.area = area
         self.outcomeDict = {R: 0, T: 0, S: 0, P: 0}
         self.evolution = [(0, self.strategy.name())]
 

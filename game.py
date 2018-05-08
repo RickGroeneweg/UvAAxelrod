@@ -2,15 +2,17 @@
 import numpy as np
 from .payoff_functions import reward, sucker, temptation, punishment
 from .country import *
-from .action import Action, Outcome, to_outcome
+from .action import *
 from geopy import distance
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
+Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate
 
 class SelfGame:
-    def __init__(self, country):
+    def __init__(self, country, surveillanceLoss = False):
         self.country = country
         self.reward = reward(self.country, self.country, 1000) #distance of a country and itself?
+        self.surveillanceLoss = surveillanceLoss
     def play(self):
         self.country.fitness = self.country.fitness + self.reward
 

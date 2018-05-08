@@ -57,7 +57,7 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1):
+    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, surveillanceLoss = False):
         '''plays the tournament'''
 
         #we initialize the rewards countries get from there own internal market
@@ -143,6 +143,60 @@ class Tournament:
         losingCountry.strategy = winningCountry.strategy
         if printing:
             print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ "changed to strategy " + winningCountry.__str__() + " (" + winningStrategyStr + ")")
+
+   def get_payoff_value(self, country1, country2, outcome1):
+
+        if country1 == country2:
+            if outcome1 == R:
+                index = self.countries.index(country1)
+                return self.selfMatches[index].selfgame.reward
+            else:
+                raise Exception("A country only cooperates against itself")
+        else:
+
+            index1 = self.countries.index(country1)
+            index2 = self.countries.index(country2)
+
+            if index2<index1:
+                #countries are given in the other order than their match is stored in self.mathces
+                (country1, country2) = (country2, country1)
+                (index1, index2) = (index2, index1)
+                swapped = True
+            else:
+                swapped = False
+
+            game = self.matches[(index1, index2)].game
+
+            if outcome1 == R:
+                if swapped:
+                    return game.reward2
+                else:
+                    return game.reward1
+            elif: outcome1 == S:
+                if swapped:
+                    return game.sucker2
+                else:
+                    return game.sucker1
+            elif: outcome1 == T:
+                if swapped:
+                    return game.temptation2
+                else:
+                    return game.temptation1
+            elif: outcome1 == P:
+                if swapped:
+                    return game.punishment2
+                else:
+                    return game.punishment1
+            else:
+                raise Exception
+
+
+
+
+
+
+
+
 
     @staticmethod
     def init_strategy(strategy, *countries):

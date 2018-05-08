@@ -26,9 +26,9 @@ class Match:
         self.changeInFitness = (0,0)
 
     def __str__(self):
-        return "<" + self.game.__str__() + " " + str(self.turns) + " turns>"
+        return "<" + self.game.__str__() + ">"
     def __repr__(self):
-        return "<" + self.game.__str__() + " " + str(self.turns) + " turns>"
+        return "<" + self.game.__str__() + ">"
 
 
     def play(self, printing = False, turns = 12): #only changes the players and cahngeinfitness

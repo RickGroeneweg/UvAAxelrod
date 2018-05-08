@@ -57,7 +57,7 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, surveillanceLoss = False):
+    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, surveillanceLoss = False, distance_function = lambda x: x):
         '''plays the tournament'''
 
         #we initialize the rewards countries get from there own internal market
@@ -71,7 +71,7 @@ class Tournament:
         #now we initialize all matches between countries
         all_combinations = list(combinations(range(len(self.countries)), 2)) #first one always lower
         for (a, b) in all_combinations:
-            newGame = Game(self.countries[a], self.countries[b])
+            newGame = Game(self.countries[a], self.countries[b], distance_function = distance_function)
             newMatch = Match(newGame)
             self.matches[(a,b)]= newMatch
 
@@ -144,7 +144,7 @@ class Tournament:
         if printing:
             print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ "changed to strategy " + winningCountry.__str__() + " (" + winningStrategyStr + ")")
 
-   def get_payoff_value(self, country1, country2, outcome1):
+    def get_payoff_value(self, country1, country2, outcome1):
 
         if country1 == country2:
             if outcome1 == R:
@@ -172,17 +172,17 @@ class Tournament:
                     return game.reward2
                 else:
                     return game.reward1
-            elif: outcome1 == S:
+            elif outcome1 == S:
                 if swapped:
                     return game.sucker2
                 else:
                     return game.sucker1
-            elif: outcome1 == T:
+            elif outcome1 == T:
                 if swapped:
                     return game.temptation2
                 else:
                     return game.temptation1
-            elif: outcome1 == P:
+            elif outcome1 == P:
                 if swapped:
                     return game.punishment2
                 else:

@@ -19,22 +19,24 @@ class SelfGame:
 class Game:
     '''Here the values of payoff functions are stored'''
 
-    def __init__(self, country1, country2):
+    def __init__(self, country1, country2, distance_function = lambda x: x):
 
         self.country1 = country1
         self.country2 = country2
 
         self.distance = distance.distance(self.country1.loc, self.country2.loc).km
 
+        self.fdistance = distance_function(self.distance)
+
         #parameters of the game
-        self.reward1 = reward(self.country1, self.country2,self.distance)
-        self.reward2 = reward(self.country2, self.country1,self.distance)
-        self.temptation1 = temptation(self.country1, self.country2,self.distance)
-        self.temptation2 = temptation(self.country2, self.country1,self.distance)
-        self.sucker1 = sucker(self.country1, self.country2,self.distance)
-        self.sucker2 = sucker(self.country2, self.country1,self.distance)
-        self.punishment1 = punishment(self.country1, self.country2,self.distance)
-        self.punishment2 = punishment(self.country1, self.country2,self.distance)
+        self.reward1 = reward(self.country1, self.country2,self.fdistance)
+        self.reward2 = reward(self.country2, self.country1,self.fdistance)
+        self.temptation1 = temptation(self.country1, self.country2,self.fdistance)
+        self.temptation2 = temptation(self.country2, self.country1,self.fdistance)
+        self.sucker1 = sucker(self.country1, self.country2,self.fdistance)
+        self.sucker2 = sucker(self.country2, self.country1,self.fdistance)
+        self.punishment1 = punishment(self.country1, self.country2,self.fdistance)
+        self.punishment2 = punishment(self.country1, self.country2,self.fdistance)
 
     def __str__(self):
         return self.country1.name + " vs " + self.country2.name

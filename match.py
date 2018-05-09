@@ -31,14 +31,14 @@ class Match:
         return "<" + self.game.__str__() + ">"
 
 
-    def play(self, printing = False, turns = 12): #only changes the players and cahngeinfitness
+    def play(self, printing = False, turns = 12, surveillancePenalty = False): #only changes the players and cahngeinfitness
         '''plays a Match'''
-        assert(self.game.country1.moves == [])
+
         initialFitness = (self.game.country1.fitness, self.game.country2.fitness)
 
 
         for _ in range(turns):
-            self.game.play()
+            self.game.play(surveillancePenalty = surveillancePenalty)
 
 
         if printing: print("match played:" + self.__str__())

@@ -57,7 +57,7 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, surveillanceLoss = False, distance_function = lambda x: x):
+    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, surveillanceLoss = False, distance_function = lambda x: x, surveillancePenalty = False):
         '''plays the tournament'''
 
         #we initialize the rewards countries get from there own internal market
@@ -88,7 +88,7 @@ class Tournament:
 
             #next the countries play against each other
             for (a,b), match in self.matches.items():
-                match.play(turns = turns)
+                match.play(turns = turns, surveillancePenalty = surveillancePenalty)
                 (self.matchResultsMatrix[a, b], self.matchResultsMatrix[b, a]) = (self.matchResultsMatrix[a, b]+match.changeInFitness[0], self.matchResultsMatrix[b, a]+ match.changeInFitness[1])
 
 

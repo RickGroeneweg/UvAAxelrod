@@ -26,7 +26,6 @@ class Game:
         self.country2 = country2
 
         self.distance = distance.distance(self.country1.loc, self.country2.loc).km
-
         self.fdistance = distance_function(self.distance)
 
         #parameters of the game
@@ -43,7 +42,7 @@ class Game:
         return self.country1.name + " vs " + self.country2.name
 
 
-    def play(self): #should this function really return something
+    def play(self, surveillancePenalty = False): #should this function really return something
         '''returns moves the countries make, and update attributes'''
         move_country1 = self.country1.strategy(self.country1, self.country2) #*kwargs?
         move_country2 = self.country2.strategy(self.country2, self.country1)
@@ -58,20 +57,36 @@ class Game:
         self.country1.history.append(outcome[0])
         self.country2.history.append(outcome[1])
 
-        (self.country1.fitness, self.country2.fitness) = self.update_fitness(outcome[0])
+        (self.country1.fitness, self.country2.fitness) = self.update_fitness(outcome[0], surveillancePenalty = surveillancePenalty)
 
         return (move_country1, move_country2)
 
 
-    def update_fitness(self, outcome_for_countr1):
+    def update_fitness(self, outcome_for_countr1, surveillancePenalty = False):
         '''updates the fitness of the two countries after a game'''
+
+
         if outcome_for_countr1 == Outcome.R:
-            return (self.country1.fitness + self.reward1, self.country2.fitness + self.reward2)
+            fitnessChange1 = self.reward1
+            fitnessChange2 = self.reward2
         elif outcome_for_countr1 == Outcome.P:
-            return (self.country1.fitness + self.punishment1, self.country2.fitness + self.punishment2)
+            fitnessChange1 = self.punishment1
+            fitnessChange2 = self.punishment2
         elif outcome_for_countr1 == Outcome.T:
-            return (self.country1.fitness + self.temptation1, self.country2.fitness + self.sucker2)
+            fitnessChange1 = self.temptation1
+            fitnessChange2 = self.sucker2
         elif outcome_for_countr1 == Outcome.S:
-            return (self.country1.fitness + self.sucker1, self.country2.fitness + self.temptation2)
+            fitnessChange1 = self.sucker1
+            fitnessChange2 = self.temptation2
         else:
             raise Exception("outcome_for_countr1 has not got the right format")
+
+        if surveillancePenalty:
+            surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.99, Grudge: 0.99, RandomMove: 1, Alternate: 1}
+            fitnessChange1 = (fitnessChange1*surveillancePenaltyDict[self.country1.strategy.name()])
+            fitnessChange2  = (fitnessChange2*surveillancePenaltyDict[self.country2.strategy.name()])
+
+
+        updatedFitnessTuple = (self.country1.fitness + fitnessChange1, self.country2.fitness + fitnessChange2)
+
+        return updatedFitnessTuple

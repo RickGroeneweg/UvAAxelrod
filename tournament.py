@@ -63,7 +63,7 @@ class Tournament:
         #we initialize the rewards countries get from there own internal market
         if playingThemselves:
             for country in self.countries:
-                newSelfGame = SelfGame(country)
+                newSelfGame = SelfGame(country, distance_function = distance_function) #the distance is chose to be the sqrt of the area of the country
                 newSelfMatch = SelfMatch(newSelfGame)
                 self.selfMatches.append(newSelfMatch)
 

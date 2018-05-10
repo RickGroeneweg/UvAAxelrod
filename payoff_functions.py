@@ -2,6 +2,10 @@ from .country import *
 from geopy import distance
 from math import sqrt
 
+
+def selfreward(country, d):
+    '''calculates how much reward a country gets from its own internal market'''
+    return country.m/d
 def reward(country, other, d):
     '''calculates how much reward would change fitness'''
     return (country.e -  country.i*other.e)*other.m / d

@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from itertools import combinations
-import random
+#import random
 from math import sqrt
 
 from .country import *
@@ -21,7 +21,7 @@ Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate = Strat.Collaborat
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
 
-    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 2000, seed = 4):
+    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 2000):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []
@@ -39,7 +39,7 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
         self.strategyList = [Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate]
-        random.seed(seed)
+
 
     def reset_after_tournament(self): #not yet tested
         for country in self.countries:
@@ -57,8 +57,10 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, surveillanceLoss = False, distance_function = lambda x: x, surveillancePenalty = False):
+    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, distance_function = lambda x: x, surveillancePenalty = False):
         '''plays the tournament'''
+
+
 
         #we initialize the rewards countries get from there own internal market
         if playingThemselves:
@@ -189,14 +191,6 @@ class Tournament:
                     return game.punishment1
             else:
                 raise Exception
-
-
-
-
-
-
-
-
 
     @staticmethod
     def init_strategy(strategy, *countries):

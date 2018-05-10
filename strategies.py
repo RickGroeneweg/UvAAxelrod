@@ -1,6 +1,6 @@
 from .country import *
 from .action import *
-import random
+#import random
 import functools
 
 C, D = Action.C, Action.D
@@ -47,7 +47,7 @@ def grudge(country1, country2):
 @give_strat(RandomMove)
 def random_move(country1, country2):
     '''returns a random move with uniform distribution'''
-    rnd = random.getrandbits(1)
+    rnd = np.random.binomial(1,1/2)
     if rnd == 0:
         return C
     else: return D
@@ -60,3 +60,9 @@ def alternate(country1, country2):
     elif country1.moves[-1] == C:
         return D
     else: return C
+
+#HOW TO ADD A STRATEGY
+#-create a new Strat(Enum) in action.py
+#-add strategy to this file, following the syntax of the other strategies
+#-add the strategy to the Tournament class, instance attribute strategyList
+#-add strategy to surveillancePenaltyDict in the Game class

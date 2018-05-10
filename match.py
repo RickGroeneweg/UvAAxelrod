@@ -15,7 +15,7 @@ class SelfMatch:
 
         self.changeInFitness = self.selfgame.country.fitness - initialFitness
 
-        self.selfgame.country.moves = []
+        self.selfgame.country.moves = [] #resetting de country's moves for the next match
 
 
 class Match:

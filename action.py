@@ -1,12 +1,12 @@
 from enum import Enum
-import random
+#mport random
 
 class Action(Enum): #C for Collaborate, D for Defect
     C=1
     D=0
 
     def stoc(self): #to do:add option for different probabilities
-        if bool(random.getrandbits(1)):
+        if bool(np.random.binomial(1,1/2)):
             if self == Action.C:
                 return Action.D
             else:

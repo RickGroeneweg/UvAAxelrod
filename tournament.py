@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from itertools import combinations
-#import random
+#import random # don't use this library, use np.random instead. Otherwise it messes up the seed
 from math import sqrt
 
 from .country import *

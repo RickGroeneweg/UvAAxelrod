@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib.patches as mpatches
 
-
 def marker_size(country ,string, factor, change = 0):
     if string == "m":
         return 1.128 * sqrt(country.m* factor)
@@ -22,8 +21,9 @@ def marker_size(country ,string, factor, change = 0):
         return 1.128 * sqrt(country.fitness* factor)
     elif string == "change":
         return 1.128 * sqrt(change* factor)
+    elif string == "none":
+        return 10*factor
     else: raise Exception("keyword for marker size not implemented")
-
 
 def marker_color(country, string, change = 0):
     if string == "m":
@@ -32,6 +32,8 @@ def marker_color(country, string, change = 0):
         return country.fitness
     elif string == "change":
         return change
+    elif string == "none":
+        return 50
     elif string == "strat":
         raise Exception("strat not impemented as colorIndicator")
     else:
@@ -41,8 +43,7 @@ def marker_style(strat):
     mydict = {Collaborate: "o", Defect: "v", TitForTat: "s", Grudge: "x", RandomMove: "D", Alternate: "*"}
     return mydict[strat]
 
-
-def draw_pie(ax, lat, lon, outcomeDict, size=600): #to do: adjust for any number of strategies, replace to a better location in the code
+def draw_pie(ax, lat, lon, outcomeDict, size=600):
 
     total = sum(outcomeDict.values())
     r1 = outcomeDict[R]/total
@@ -77,18 +78,18 @@ def draw_pie(ax, lat, lon, outcomeDict, size=600): #to do: adjust for any number
 def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
     if rounds ==0:
         rounds = tournament.rounds
-        numberOfStrategies = 6
+        numberOfStrategies = len(tournament.strategyList)
     numberOfRounds = rounds
     matrix = np.zeros((numberOfStrategies, numberOfRounds+1))
-    #mydict = {Collaborate: 0, Defect:1, TitForTat:2, Grudge: 3, RandomMove:4, Alternate: 5}
+
     cmap = plt.get_cmap(cmap)
-    colors = [cmap(value/5) for value in range(6)]
+    colors = [cmap(value/(numberOfStrategies-1)) for value in range(numberOfStrategies)]
     for country in tournament.countries:
         for i, (n, strat) in enumerate(country.evolution[:-1]):
             row = tournament.strategyList.index(strat)
             next_n = country.evolution[i+1][0]
             matrix[row, n:next_n] += country.m
-        #to do: last line
+        #last strategy
         last_evo, last_strategy = country.evolution[-1]
         row = tournament.strategyList.index(last_strategy)
         matrix[row, last_evo:] += country.m
@@ -102,10 +103,9 @@ def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
     plt.xlabel('Round number')
     plt.show()
 
-def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gnuplot'):
+def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10):
 
     cmap = plt.get_cmap(cmap)
-
 
     if selecting:
         countries=selecting
@@ -113,33 +113,39 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gnuplot
         countries = [country for country in tournament.countries if not country in filtering]
     else:
         countries = tournament.countries
-    for country in countries:
-        draw_country_line(country, cmap =cmap)
 
+    fig, ax = plt.subplots(figsize =(xSize, ySize))
+
+    for country in countries:
+        draw_country_line(country, cmap, tournament.strategyList)
+
+    #ax.legend(loc=5)
+    plt.ylabel('Fitness')
+    plt.xlabel('round')
+    plt.show()
 
     plt.ylabel('fitness')
     plt.show()
 
-def draw_country_line(country, cmap = 'gnuplot'): #need to add a color legend and collor line option
-    colorDict = {Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
-    cmap = plt.get_cmap(cmap)
-    colors = [cmap(value) for value in range(6)]
-    le = len(country.evolution)
+def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
 
+    colors = [cmap(value/(len(strategyList)-1)) for value in range(len(strategyList))]
+
+    colorDict = dict(zip(strategyList, colors))
+
+    le = len(country.evolution)
 
     for evo_nr in range(le-1):
         Xstart = country.evolution[evo_nr][0]
-        Xend = country.evolution[evo_nr+1][0]
+        Xend = country.evolution[evo_nr+1][0] +1 #number +1 correct?
         newColor = colorDict[country.evolution[evo_nr][1]]
-        plt.plot(range(Xstart, Xend ), country.fitnessHistory[Xstart: Xend])
+        plt.plot(range(Xstart, Xend ), country.fitnessHistory[Xstart: Xend], color = newColor)
 
     Xstart = country.evolution[-1][0]
     Xend = len(country.fitnessHistory)
     lastColor = colorDict[country.evolution[-1][1]]
-    plt.plot(range(Xstart, Xend), country.fitnessHistory[Xstart:])
-
-
-
+    plt.plot(range(Xstart, Xend), country.fitnessHistory[Xstart:], color = lastColor)
+    plt.annotate(country.name, xy=(Xend, country.fitnessHistory[-1]))
 
 def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40):
     '''draws for every country the evolution of its stategy'''
@@ -149,8 +155,6 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40):
     allCountryNames = [country.__str__() for country in tournament.countries]
 
     matrix = make_evolution_matrix(tournament.countries, rounds)
-
-
 
     fig, ax = plt.subplots(figsize=(xSize, ySize))
     im = ax.imshow(matrix, cmap =plt.get_cmap(cmap), aspect='auto')
@@ -175,7 +179,6 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40):
     #fig.tight_layout()
     plt.show()
 
-
 def make_evolution_matrix(countries, rounds):
     '''helper function to draw_evo'''
     valueDict = {Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
@@ -191,7 +194,6 @@ def make_evolution_matrix(countries, rounds):
         result[country_index, country.evolution[-1][0]: ] =last_value
 
     return result
-
 
 def select_or_filter_names(tournament, selecting =[], filtering = []):#not finished yet
     allCountryNames = [country.__str__() for country in tournament.countries]
@@ -218,7 +220,6 @@ def draw_round_robin_matrix(tournament, texting = False, selecting = [], filteri
     print(indices)
     #helper method should end here
 
-
     matrix = tournament.matchResultsMatrix[indices, :][:, indices] #matrix with only rows and columns of indexed countries
 
     fig, ax = plt.subplots(figsize=(xSize, ySize))
@@ -243,7 +244,6 @@ def draw_round_robin_matrix(tournament, texting = False, selecting = [], filteri
     ax.set_title("Round Robin Matrix")
     fig.tight_layout()
     plt.show()
-
 
 def colorbarMinAndMax(tournament, colorIndicator):
     if colorIndicator != "out":
@@ -294,7 +294,6 @@ def draw_geo(tournament, factor = 50, resol = 'c', colorIndicator = "out", sizeI
 
     plt.title("Geographical Plot")
     plt.show()
-
 
 def draw_country_marker(ax, country, colorIndicator="out", sizeIndicator="m", factor = 1, change = 100, cmax = 0, cmin = 0):
     '''helper function to draw_geo'''

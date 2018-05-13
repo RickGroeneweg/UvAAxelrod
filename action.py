@@ -1,13 +1,13 @@
 from enum import Enum
 import numpy as np
-#mport random
+#import random
 
 class Action(Enum): #C for Collaborate, D for Defect
     C=1
     D=0
 
-    def stoc(self): #to do:add option for different probabilities
-        if bool(np.random.binomial(1,1/2)):
+    def stoc(self, probability): #to do:add option for different probabilities
+        if bool(np.random.binomial(1, probability)):
             if self == Action.C:
                 return Action.D
             else:

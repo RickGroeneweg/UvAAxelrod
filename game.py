@@ -84,7 +84,7 @@ class Game:
             raise Exception("outcome_for_countr1 has not got the right format")
 
         if surveillancePenalty:
-            surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.99, Grudge: 0.99, RandomMove: 1, Alternate: 1}
+            surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.99, Grudge: 0.99, RandomMove: 1, Alternate: 1, GenerousTFT: 1, WinStayLoseShift:1}
             fitnessChange1 = (fitnessChange1*surveillancePenaltyDict[self.country1.strategy.name()])
             fitnessChange2  = (fitnessChange2*surveillancePenaltyDict[self.country2.strategy.name()])
 

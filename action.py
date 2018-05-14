@@ -35,6 +35,8 @@ class Strat(Enum):
     Grudge =3
     RandomMove = 4
     Alternate = 5
+    GenerousTFT = 6
+    WinStayLoseShift = 7
 
     def __str__(self):
         return self.name

@@ -21,6 +21,10 @@ def marker_size(country ,string, factor, change = 0):
         return 1.128 * sqrt(country.fitness* factor)
     elif string == "change":
         return 1.128 * sqrt(change* factor)
+    elif string == "e":
+        return 1.128 * sqrt(country.e* factor)
+    elif string == "i":
+        return 1.128 * sqrt(country.i* factor)
     elif string == "none":
         return 10*factor
     else: raise Exception("keyword for marker size not implemented")
@@ -32,6 +36,10 @@ def marker_color(country, string, change = 0):
         return country.fitness
     elif string == "change":
         return change
+    elif string == "e":
+        return country.e
+    elif string == "i":
+        return country.i
     elif string == "none":
         return 50
     elif string == "strat":
@@ -97,8 +105,8 @@ def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
     stack = np.vstack(matrix)
 
     fig, ax = plt.subplots(figsize =(xSize, ySize))
-    ax.stackplot(range(rounds+1), matrix[0,:], matrix[1,:], matrix[2,:], matrix[3,:], matrix[4,:], matrix[5,:], labels=tournament.strategyList, colors= colors)
-    ax.legend(loc=5)
+    ax.stackplot(range(rounds+1), *matrix, labels=tournament.strategyList, colors= colors) #this needs to be adjusted for the number of strategies
+    ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
     plt.ylabel('Market share')
     plt.xlabel('Round number')
     plt.show()
@@ -124,8 +132,6 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
     plt.xlabel('round')
     plt.show()
 
-    plt.ylabel('fitness')
-    plt.show()
 
 def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
 
@@ -147,14 +153,22 @@ def draw_country_line(country, cmap, strategyList): #need to add a color legend 
     plt.plot(range(Xstart, Xend), country.fitnessHistory[Xstart:], color = lastColor)
     plt.annotate(country.name, xy=(Xend, country.fitnessHistory[-1]))
 
-def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40):
+def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, selecting = None, filtering = None): #To do: add selecting
     '''draws for every country the evolution of its stategy'''
     if rounds ==0:
         rounds = tournament.rounds
 
-    allCountryNames = [country.__str__() for country in tournament.countries]
+    allCountryNames = [str(country) for country in tournament.countries]
+    if selecting:
+        countryNames = [str(country) for country in selecting]
+        countries = selecting
+    elif filtering:
+        countryNames = [str(country) for country in tournament.countries if country not in filtering ]
+    else:
+        countryNames = allCountryNames
+        countries = tournament.countries
 
-    matrix = make_evolution_matrix(tournament.countries, rounds)
+    matrix = make_evolution_matrix(tournament, countries, rounds)
 
     fig, ax = plt.subplots(figsize=(xSize, ySize))
     im = ax.imshow(matrix, cmap =plt.get_cmap(cmap), aspect='auto')
@@ -179,9 +193,9 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40):
     #fig.tight_layout()
     plt.show()
 
-def make_evolution_matrix(countries, rounds):
+def make_evolution_matrix(tournament, countries, rounds):
     '''helper function to draw_evo'''
-    valueDict = {Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
+    valueDict = dict(zip(tournament.strategyList, range(len(tournament.strategyList))))#{Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
     result = np.zeros((len(countries), rounds+1))
 
     for country_index, country in enumerate(countries):
@@ -208,11 +222,11 @@ def draw_round_robin_matrix(tournament, texting = False, selecting = [], filteri
     '''draws a matrix where for every country the amount of change in fitness due to every other country is drawn'''
     #this should be a helper method using variables: selecting, filtering
          #returning: list of indices
-    allCountryNames = [country.__str__() for country in tournament.countries]
+    allCountryNames = [str(country) for country in tournament.countries]
     if selecting:
-        countryNames = [country.__str__() for country in selecting]
+        countryNames = [str(country) for country in selecting]
     elif filtering:
-        countryNames = [country.__str__() for country in tournament.countries if country not in filtering ]
+        countryNames = [str(country) for country in tournament.countries if country not in filtering ]
     else:
         countryNames = allCountryNames
     print(countryNames)
@@ -256,6 +270,14 @@ def colorbarMinAndMax(tournament, colorIndicator):
             cmin = min(tournament.changeInFitness)
         elif colorIndicator == "fit":
             lijst = [country.fitness for country in tournament.countries]
+            cmax = max(lijst)
+            cmin = min(lijst)
+        elif colorIndicator == "e":
+            lijst = [country.e for country in tournament.countries]
+            cmax = max(lijst)
+            cmin = min(lijst)
+        elif colorIndicator == "i":
+            lijst = [country.i for country in tournament.countries]
             cmax = max(lijst)
             cmin = min(lijst)
         else:

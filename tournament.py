@@ -16,7 +16,7 @@ import matplotlib.patches as mpatches
 
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
-Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate
+Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
 
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
@@ -38,7 +38,7 @@ class Tournament:
 
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
-        self.strategyList = [Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate]
+        self.strategyList = [Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift]
 
 
     def reset_after_tournament(self): #not yet tested

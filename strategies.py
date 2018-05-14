@@ -4,7 +4,7 @@ from .action import *
 import functools
 
 C, D = Action.C, Action.D
-Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate
+Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
 
 
 def give_strat (strat):
@@ -60,6 +60,24 @@ def alternate(country1, country2):
     elif country1.moves[-1] == C:
         return D
     else: return C
+
+@give_strat(GenerousTFT)
+def generoustft(country1, country2):
+    if country2.moves == []: # not country2.moves more efficient, but needs checking
+        return C
+    elif country2.moves[-1] == C:
+        return C
+    else:
+        return D.stoc(0.3)
+
+@give_strat(WinStayLoseShift)
+def win_stay_lose_shift(country1, country2):
+    if country2.moves ==[]:
+        return C
+    elif country2.moves[-1]==country1.moves[-1]:
+        return C
+    else:
+        return D
 
 #HOW TO ADD A STRATEGY
 #-create a new Strat(Enum) in action.py

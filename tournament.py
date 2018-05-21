@@ -28,6 +28,8 @@ class Tournament:
         self.rounds = rounds
 
 
+
+
         if initialFitnessEqualsM:
             for country in self.countries:
                 country.fitness = country.m
@@ -38,7 +40,7 @@ class Tournament:
 
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
-        self.strategyList = [Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift]
+        self.strategyList = [collaborate, defect, tit_for_tat, grudge, random_move, alternate, generoustft, win_stay_lose_shift]
 
 
     def reset_after_tournament(self): #not yet tested
@@ -57,7 +59,7 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 12, changingStrategy = True, playingThemselves = False, nrStrategyChanges = 1, distance_function = lambda x: x, surveillancePenalty = False):
+    def play(self, printing = True, turns = 12, changingStrategy = True, mutationRate = 0.05 , playingThemselves = False, nrStrategyChanges = 1, distance_function = lambda x: x, surveillancePenalty = False):
         '''plays the tournament'''
 
 
@@ -96,7 +98,7 @@ class Tournament:
 
             if changingStrategy:
                 for _ in range(nrStrategyChanges):
-                    self.change_a_strategy(n+1, printing = printing)
+                    self.change_a_strategy(n+1, mutationRate, printing = printing, strategyList = self.strategyList)
 
             for country in self.countries:
                 country.fitnessHistory.append(country.fitness)
@@ -121,30 +123,36 @@ class Tournament:
         print("All strategies are the same")
         return True
 
-    def change_a_strategy(self, roundNum,  printing = True ):
+    def change_a_strategy(self, roundNum, mutationRate,  printing = True, strategyList = [] ):
         '''selects a random country to change it's strategy to a strategy of a country with a high fitness'''
 
         N = len(self.countries)
-
-        #probabilites cannot be negative, so all negative fitnesses are pretended to be 0
-        fitnessScores= [(country.fitness>0)*country.fitness for country in self.countries] #True ==1, False ==0
-
-        total_fitness = sum(fitnessScores)
-        probabilities = [fitnessScores[i]/total_fitness for i in range(N)]
-
-        reproduce_index = np.random.choice(range(N), p=probabilities)
         eliminate_index = np.random.randint(N)
-
         losingCountry = self.countries[eliminate_index]
-        winningCountry = self.countries[reproduce_index]
         losingStrategyStr = str(losingCountry.strategy.name())
-        winningStrategyStr = str(winningCountry.strategy.name())
 
-        losingCountry.evolution.append((roundNum, winningCountry.strategy.name()))
+        #is there a mutation in stead?
+        mutation = bool(np.random.binomial(1, mutationRate))
+        if mutation:
+            winningStrategy = np.choice(strategyList)
+            winningCountry = "Mutation"
+        else:
+            #probabilites cannot be negative, so all negative fitnesses are pretended to be 0
+            fitnessScores= [(country.fitness>0)*country.fitness for country in self.countries] #True ==1, False ==0
 
-        losingCountry.strategy = winningCountry.strategy
+            total_fitness = sum(fitnessScores)
+             probabilities = [fitnessScores[i]/total_fitness for i in range(N)]
+
+            reproduce_index = np.random.choice(range(N), p=probabilities)
+            winningCountry = self.countries[reproduce_index]
+            winningStrategy = winningCountry.strategy
+
+        #append to country's evolution list
+        losingCountry.evolution.append((roundNum, winningStrategy.name()))
+
+        losingCountry.strategy = winningStrategy
         if printing:
-            print("strategy " + losingCountry.__str__() + " (" + losingStrategyStr + ") "+ "changed to strategy " + winningCountry.__str__() + " (" + winningStrategyStr + ")")
+            print("strategy " + str(losingCountry) + " (" + losingStrategyStr + ") "+ "changed to strategy " + str(winningCountry) + " (" + winningStrategyStr + ")")
 
     def get_payoff_value(self, country1, country2, outcome1):
 

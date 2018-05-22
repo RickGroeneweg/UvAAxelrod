@@ -11,17 +11,17 @@ from .match import *
 from .action import *
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
 import matplotlib.patches as mpatches
 
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
-Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
+Collaborate, Defect, TitForTat,GenerousTFT = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.GenerousTFT
 
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
 
-    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 2000):
+    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 10000):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []
@@ -40,8 +40,7 @@ class Tournament:
 
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
-        self.strategyList = [collaborate, defect, tit_for_tat, grudge, random_move, alternate, generoustft, win_stay_lose_shift]
-
+        self.strategyList = [collaborate, defect, tit_for_tat, generoustft]
 
     def reset_after_tournament(self): #not yet tested
         for country in self.countries:
@@ -59,7 +58,7 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 12, changingStrategy = True, mutationRate = 0.05 , playingThemselves = False, nrStrategyChanges = 1, distance_function = lambda x: x, surveillancePenalty = False):
+    def play(self, printing = True, turns = 1, changingStrategy = True, mutationRate = 0.1 , playingThemselves = False, nrStrategyChanges = 1, distance_function = lambda x: x, surveillancePenalty = False):
         '''plays the tournament'''
 
 
@@ -134,14 +133,14 @@ class Tournament:
         #is there a mutation in stead?
         mutation = bool(np.random.binomial(1, mutationRate))
         if mutation:
-            winningStrategy = np.choice(strategyList)
-            winningCountry = "Mutation"
+            winningStrategy = np.random.choice(strategyList)
+            winningCountry = "Random Mutation"
         else:
             #probabilites cannot be negative, so all negative fitnesses are pretended to be 0
             fitnessScores= [(country.fitness>0)*country.fitness for country in self.countries] #True ==1, False ==0
 
             total_fitness = sum(fitnessScores)
-             probabilities = [fitnessScores[i]/total_fitness for i in range(N)]
+            probabilities = [fitnessScores[i]/total_fitness for i in range(N)]
 
             reproduce_index = np.random.choice(range(N), p=probabilities)
             winningCountry = self.countries[reproduce_index]
@@ -152,7 +151,7 @@ class Tournament:
 
         losingCountry.strategy = winningStrategy
         if printing:
-            print("strategy " + str(losingCountry) + " (" + losingStrategyStr + ") "+ "changed to strategy " + str(winningCountry) + " (" + winningStrategyStr + ")")
+            print("strategy " + str(losingCountry) + " (" + losingStrategyStr + ") "+ "changed to strategy " + str(winningCountry) +  " (" + str(winningStrategy.name()) + ")")
 
     def get_payoff_value(self, country1, country2, outcome1):
 

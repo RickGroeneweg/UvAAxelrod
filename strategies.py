@@ -4,9 +4,9 @@ from .action import *
 import functools
 
 C, D = Action.C, Action.D
-Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
+Collaborate, Defect, TitForTat, GenerousTFT = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.GenerousTFT
 
-DefaultNoise = 0.05
+DefaultNoise = 0.1
 
 def give_strat (strat):
     '''A decorator function, that adds a Strat (Enum) method to a function object (like a strategy)'''
@@ -36,32 +36,7 @@ def tit_for_tat(country1, country2, noise=DefaultNoise):
     if country2.moves == []: # not country2.moves more efficient, but needs checking
         return C.stoc(noise)
     else: return country2.moves[-1].stoc(noise)
-
-@give_strat(Grudge)
-def grudge(country1, country2, noise=DefaultNoise):
-    '''Starts collaborating, but once the opponent defects, it will defect for the rest of the match''' #need thinking about noise
-    if country1.moves == [] or country2.moves == []: return C.stoc(noise)
-    elif country2.moves[-1] == D or country1.moves[-1] == D:
-        return D.stoc(noise)
-    else: return C.stoc(noise)
-
-@give_strat(RandomMove)
-def random_move(country1, country2, noise=DefaultNoise):
-    '''returns a random move with uniform distribution'''
-    rnd = np.random.binomial(1,1/2)
-    if rnd == 0:
-        return C.stoc(noise)
-    else: return D.stoc(noise)
-
-@give_strat(Alternate)
-def alternate(country1, country2, noise=DefaultNoise):
-    '''alternates between collaborating dan defecting'''
-    if country1.moves == []:
-        return C.stoc(noise)
-    elif country1.moves[-1] == C:
-        return D.stoc(noise)
-    else: return C.stoc(noise)
-
+    
 @give_strat(GenerousTFT)
 def generoustft(country1, country2, noise=DefaultNoise):
     if country2.moves == []: # not country2.moves more efficient, but needs checking
@@ -70,6 +45,31 @@ def generoustft(country1, country2, noise=DefaultNoise):
         return C.stoc(noise)
     else:
         return D.stoc(0.3).stoc(noise)
+'''
+@give_strat(Grudge)
+def grudge(country1, country2, noise=DefaultNoise):
+    Starts collaborating, but once the opponent defects, it will defect for the rest of the match #need thinking about noise
+    if country1.moves == [] or country2.moves == []: return C.stoc(noise)
+    elif country2.moves[-1] == D or country1.moves[-1] == D:
+        return D.stoc(noise)
+    else: return C.stoc(noise)
+
+@give_strat(RandomMove)
+def random_move(country1, country2, noise=DefaultNoise):
+    returns a random move with uniform distribution
+    rnd = np.random.binomial(1,1/2)
+    if rnd == 0:
+        return C.stoc(noise)
+    else: return D.stoc(noise)
+
+@give_strat(Alternate)
+def alternate(country1, country2, noise=DefaultNoise):
+    alternates between collaborating dan defecting
+    if country1.moves == []:
+        return C.stoc(noise)
+    elif country1.moves[-1] == C:
+        return D.stoc(noise)
+    else: return C.stoc(noise)
 
 @give_strat(WinStayLoseShift)
 def win_stay_lose_shift(country1, country2, noise=DefaultNoise):
@@ -79,6 +79,15 @@ def win_stay_lose_shift(country1, country2, noise=DefaultNoise):
         return C.stoc(noise)
     else:
         return D.stoc(noise)
+
+@give_strat(Contrite)
+def contrite_titfortat(country1,country2):
+    if len(country1.moves <= 
+        return tit_for_tat(country1,country2)
+    elif country1.moves[-2] == D and countrty2.moves[-2] == C: 
+        return C 
+    else:
+        return tit_for_tat(country1, country2)''' 
 
 #HOW TO ADD A STRATEGY
 #-create a new Strat(Enum) in action.py

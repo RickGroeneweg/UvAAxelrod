@@ -16,7 +16,7 @@ import matplotlib.patches as mpatches
 
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
-Collaborate, Defect, TitForTat,GenerousTFT = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.GenerousTFT
+Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
 
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''

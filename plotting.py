@@ -92,20 +92,23 @@ def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
 
     cmap = plt.get_cmap(cmap)
     colors = [cmap(value/(numberOfStrategies-1)) for value in range(numberOfStrategies)]
+
+    strategyListStrats = [s.name() for s in tournament.strategyList]
     for country in tournament.countries:
         for i, (n, strat) in enumerate(country.evolution[:-1]):
-            row = tournament.strategyList.index(strat)
+
+            row = strategyListStrats.index(strat)
             next_n = country.evolution[i+1][0]
             matrix[row, n:next_n] += country.m
         #last strategy
         last_evo, last_strategy = country.evolution[-1]
-        row = tournament.strategyList.index(last_strategy)
+        row = strategyListStrats.index(last_strategy)
         matrix[row, last_evo:] += country.m
 
     stack = np.vstack(matrix)
 
     fig, ax = plt.subplots(figsize =(xSize, ySize))
-    ax.stackplot(range(rounds+1), *matrix, labels=tournament.strategyList, colors= colors) #this needs to be adjusted for the number of strategies
+    ax.stackplot(range(rounds+1), *matrix, labels=strategyListStrats, colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
     plt.ylabel('Market share', fontsize='xx-large')
     plt.xlabel('Round number', fontsize='xx-large')
@@ -131,7 +134,7 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
     plt.ylabel('Fitness', fontsize='xx-large')
     plt.xlabel('Rounds', fontsize='xx-large')
     plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
-    
+
 
 def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
 
@@ -185,7 +188,7 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, sele
     # colormap used by imshow
     colors = [ im.cmap(im.norm(value)) for value in range(len(tournament.strategyList))]
     # create a patch (proxy artist) for every color
-    patches = [ mpatches.Patch(color=colors[i], label=tournament.strategyList[i]) for i in range(len(tournament.strategyList)) ]
+    patches = [ mpatches.Patch(color=colors[i], label=tournament.strategyList[i].name()) for i in range(len(tournament.strategyList)) ]
     # put those patched as legend-handles into the legend
     plt.legend(handles=patches, bbox_to_anchor=(0.99,0.99),ncol=1, fontsize='xx-large')
 
@@ -194,7 +197,9 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, sele
 
 def make_evolution_matrix(tournament, countries, rounds):
     '''helper function to draw_evo'''
-    valueDict = dict(zip(tournament.strategyList, range(len(tournament.strategyList))))#{Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
+
+    strategyListStrats = [s.name() for s in tournament.strategyList]
+    valueDict = dict(zip(strategyListStrats, range(len(tournament.strategyList)))) #{Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
     result = np.zeros((len(countries), rounds+1))
 
     for country_index, country in enumerate(countries):
@@ -256,7 +261,7 @@ def draw_round_robin_matrix(tournament, texting = False, selecting = [], filteri
 
     ax.set_title("Round Robin Matrix")
     fig.tight_layout()
-    
+
 def colorbarMinAndMax(tournament, colorIndicator):
     if colorIndicator != "out":
         if colorIndicator == "m":

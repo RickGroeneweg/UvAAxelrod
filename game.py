@@ -8,7 +8,7 @@ from geopy import distance
 from math import sqrt, log
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
-Collaborate, Defect, TitForTat, GenerousTFT = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.GenerousTFT
+Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT
 
 class SelfGame:
     def __init__(self, country, distance_function = lambda x: x):
@@ -85,7 +85,7 @@ class Game:
             raise Exception("outcome_for_countr1 has not got the right format")
 
         if surveillancePenalty:
-            surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.95,GenerousTFT: 0.95}
+            surveillancePenaltyDict = surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.95, Grudge: 0.95, RandomMove: 1, Alternate: 1, GenerousTFT: 0.95, WinStayLoseShift:1, GenerousTFT: 0.95}
             fitnessChange1 = (fitnessChange1*surveillancePenaltyDict[self.country1.strategy.name()])
             fitnessChange2  = (fitnessChange2*surveillancePenaltyDict[self.country2.strategy.name()])
 

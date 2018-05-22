@@ -1,13 +1,14 @@
 
+
 import numpy as np
 from .payoff_functions import reward, sucker, temptation, punishment, selfreward
 from .country import *
 from .action import *
 from geopy import distance
-from math import sqrt
+from math import sqrt, log
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
-Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate
+Collaborate, Defect, TitForTat, GenerousTFT = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.GenerousTFT
 
 class SelfGame:
     def __init__(self, country, distance_function = lambda x: x):
@@ -84,7 +85,7 @@ class Game:
             raise Exception("outcome_for_countr1 has not got the right format")
 
         if surveillancePenalty:
-            surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.99, Grudge: 0.99, RandomMove: 1, Alternate: 1, GenerousTFT: 1, WinStayLoseShift:1}
+            surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.95,GenerousTFT: 0.95}
             fitnessChange1 = (fitnessChange1*surveillancePenaltyDict[self.country1.strategy.name()])
             fitnessChange2  = (fitnessChange2*surveillancePenaltyDict[self.country2.strategy.name()])
 

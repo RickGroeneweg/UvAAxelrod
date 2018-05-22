@@ -2,7 +2,7 @@
 import numpy as np
 import math
 from itertools import combinations
-from math import sqrt
+from math import sqrt,log
 
 from .country import *
 from .game import *
@@ -11,7 +11,7 @@ from .match import *
 from .action import *
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
 import matplotlib.patches as mpatches
 
 def marker_size(country ,string, factor, change = 0):
@@ -48,7 +48,7 @@ def marker_color(country, string, change = 0):
         raise Exception("colorIndicator not impemented")
 
 def marker_style(strat):
-    mydict = {Collaborate: "o", Defect: "v", TitForTat: "s", Grudge: "x", RandomMove: "D", Alternate: "*"}
+    mydict = {Collaborate: "o", Defect: "v", TitForTat: "s", GenerousTFT: "x"}
     return mydict[strat]
 
 def draw_pie(ax, lat, lon, outcomeDict, size=600):
@@ -107,9 +107,9 @@ def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
     fig, ax = plt.subplots(figsize =(xSize, ySize))
     ax.stackplot(range(rounds+1), *matrix, labels=tournament.strategyList, colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
-    plt.ylabel('Market share')
-    plt.xlabel('Round number')
-    plt.show()
+    plt.ylabel('Market share', fontsize='xx-large')
+    plt.xlabel('Round number', fontsize='xx-large')
+    plt.title('Evolution of Strategies in Heterogenous Populations', fontsize='xx-large')
 
 def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10):
 
@@ -128,10 +128,10 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
         draw_country_line(country, cmap, tournament.strategyList)
 
     #ax.legend(loc=5)
-    plt.ylabel('Fitness')
-    plt.xlabel('round')
-    plt.show()
-
+    plt.ylabel('Fitness', fontsize='xx-large')
+    plt.xlabel('Rounds', fontsize='xx-large')
+    plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
+    
 
 def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
 
@@ -187,11 +187,10 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, sele
     # create a patch (proxy artist) for every color
     patches = [ mpatches.Patch(color=colors[i], label=tournament.strategyList[i]) for i in range(len(tournament.strategyList)) ]
     # put those patched as legend-handles into the legend
-    plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=5, borderaxespad=0. )
+    plt.legend(handles=patches, bbox_to_anchor=(0.99,0.99),ncol=1, fontsize='xx-large')
 
-    ax.set_title("Evolution")
+    ax.set_title("Evolution of each Country's Strategy", fontsize='xx-large')
     #fig.tight_layout()
-    plt.show()
 
 def make_evolution_matrix(tournament, countries, rounds):
     '''helper function to draw_evo'''
@@ -257,8 +256,7 @@ def draw_round_robin_matrix(tournament, texting = False, selecting = [], filteri
 
     ax.set_title("Round Robin Matrix")
     fig.tight_layout()
-    plt.show()
-
+    
 def colorbarMinAndMax(tournament, colorIndicator):
     if colorIndicator != "out":
         if colorIndicator == "m":

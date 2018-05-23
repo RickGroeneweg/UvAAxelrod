@@ -136,8 +136,9 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
     plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
 
 
-def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
+def draw_country_line(country, cmap, strategyListfunctions): #need to add a color legend and color line option
 
+    strategyList = [s.name() for s in strategyListfunctions]
     colors = [cmap(value/(len(strategyList)-1)) for value in range(len(strategyList))]
 
     colorDict = dict(zip(strategyList, colors))

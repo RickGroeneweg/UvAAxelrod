@@ -38,15 +38,13 @@ costarica = Country("Costa Rica",57.436,SanJose,0.17,0.049,tit_for_tat,  226.05)
 ivorycoast = Country("Côte d'Ivoire",36.165,Yamoussoukro,0.35,0.083,tit_for_tat,  567.86)
 croatia = Country("Croatia",50.425,Zagreb,0.66,0.03,tit_for_tat,  237.89)
 cuba = Country("Cuba",89.689,Havana,0.03,0.064,tit_for_tat,  331.48)
-cyprus = Country("Cyprus",19.802,Nicosia,0.083324917,0.03,tit_for_tat,  96.18)
-czechia = Country("Czech Republic",192.925,Prague,0.829337826,0.03,tit_for_tat,  280.84)
-#drCongo = Country("Democratic Republic of Congo",34.999,Kinshasa, 0.16, )
+cyprus = Country("Cyprus",19.802,Nicosia,0.34,0.03,tit_for_tat,  96.18)
+czechia = Country("Czech Republic",192.925,Prague,2,0.03,tit_for_tat,  280.84)
 denmark = Country("Denmark",306.143,Copenhagen,0.27,0.03,tit_for_tat,  207.18)
-#djibouti
 dominica = Country("Dominica",0.525,Roseau, 0.19, 0.143,tit_for_tat, 27.38612788)
 dominicanr = Country("Dominican Republic",71.584,SantoDomingo,0.12,0.076,tit_for_tat,  220.61)
-ecuador = Country("Ecuador",97.802,Quito,0.42,0.094,tit_for_tat,  506.33)
-egypt = Country("Egypt",336.297,Cairo,0.07,0.106,tit_for_tat,  1000.72)
+ecuador = Country("Ecuador",97.802,Quito,0.42,0.094,tit_for_tat,506.33)
+egypt = Country("Egypt",336.297,Cairo,0.07,0.106,tit_for_tat,1000.72)
 elsalvador = Country("El Salvador",26.797,SanSalvador,0.47,0.071,tit_for_tat,  145.05)
 estonia = Country("Estonia",23.137,Tallinn,1.159,0.03,tit_for_tat,  212.67)
 fiji = Country("Fiji",4.632,Suva,0.170120898,0.51,tit_for_tat,  135.17)
@@ -82,16 +80,13 @@ kuwait = Country("Kuwait",112.812,KuwaitCity,0.46,0.047,tit_for_tat,  133.49)
 kyrgyzystan = Country("Kyrgyzstan",6.551,Bishkek,0.57,0.077,tit_for_tat,  447.16)
 laos = Country("Laos", 15.903, Vientiane, 0.75, 0.085, tit_for_tat, 487)
 latvia = Country("Latvia",27.677,Riga,1.1,0.03,tit_for_tat, 253.95 )
-#lesotho = Country("
 liberia = Country("Liberia", 2.101, Monrovia, 0.91, 0.107, tit_for_tat, 334)
-#liechtenstein
 lithuania = Country("Lithuania",42.739,Vilnius,0.58,0.03,tit_for_tat, 255.51)
 luxembourg = Country("Luxembourg", 59.948, Luxembourg, 0.21, 0.03, tit_for_tat, 51)
 macau = Country("Macau",44.803,Macau,0.07,0,tit_for_tat,  5.50)
 madagascar = Country("Madagascar",9.991,Antananarivo,0.25,0.077,tit_for_tat,  766.35)
 malawi = Country("Malawi",5.442,Lilongwe,0.33,0.08,tit_for_tat,  344.21)
 malaysia = Country("Malaysia",296.359,KualaLumpur,0.62,0.043,tit_for_tat,  575.15)
-#maldives
 mali = Country("Mali", 14.045, Bamako, 0.65, 0.104, tit_for_tat, 1114)
 malta = Country("Malta",10.949,Valletta,1.16,0.03,tit_for_tat,  17.89)
 mauritania = Country("Mauritania",4.635,Nouakchott,1.32,0.082,tit_for_tat,  1015.23)
@@ -102,8 +97,6 @@ mongolia = Country("Mongolia",11.16,Ulaanbaatar,1.06,0.051,tit_for_tat,  1250.65
 montenegro = Country("Montenegro",4.173,Podgorica,0.24,0.066,tit_for_tat,  117.52)
 morocco = Country("Morocco",101.445,Rabat,0.22,0.093,tit_for_tat,  668.24)
 mozambique = Country("Mozambique",11.015,Maputo,0.55,0.069,tit_for_tat,  894.08)
-#myanmar
-#namibia
 nepal = Country("Nepal",21.144,Kathmandu,0.06,0.122,tit_for_tat, 383.64)
 netherlands = Country("Netherlands",777.227,Amsterdam,0.56,0.03,tit_for_tat,  203.81)
 newzealand = Country("New Zealand",185.017,Wellington,0.19,0.025,tit_for_tat,  517.41)
@@ -114,13 +107,12 @@ norway = Country("Norway",370.557,Oslo,0.24,0.028,tit_for_tat,  620.63)
 oman = Country("Oman",66.293,Muscat,0.32,0.058,tit_for_tat,  556.33)
 pakistan = Country("Pakistan",283.66,Islamabad,0.07,0.107,tit_for_tat,  892.24)
 panama = Country("Panama",55.188,PanamaCity,0.46,0.063,tit_for_tat,  274.63)
-#papua
 paraguay = Country("Paraguay",27.441,Asuncion,0.67,0.068,tit_for_tat,  637.77)
-peru = Country("Peru",192.094,Lima,0.185325934,0.19,tit_for_tat,  1133.68)
+peru = Country("Peru",192.094,Lima,0.19,0.18,tit_for_tat,  1133.68)
 philippines = Country("Philippines",304.905,Manila,0.65,0.053,tit_for_tat,  547.72)
 poland = Country("Poland",469.509,Warsaw,0.42,0.03,tit_for_tat,  559.18)
 portugal = Country("Portugal",204.565,Lisbon,0.27,0.03,tit_for_tat,  303.69)
-qatar = Country("Qatar",152.469,Doha,0.361384937,0.98,tit_for_tat,  107.75)
+qatar = Country("Qatar",152.469,Doha,0.98,0.046,tit_for_tat,  107.75)
 macedonia = Country("Republic of Macedonia",10.9,Skopje,1.13,0.065,tit_for_tat,  160.34)
 congo = Country("Republic of the Congo",7.834,Brazzaville,1.26,0.118,tit_for_tat,  584.81)
 romania = Country("Romania",186.691,Bucharest,0.34,0.03,tit_for_tat,  488.25)
@@ -128,7 +120,7 @@ russia = Country("Russia",1283.162,Moscow,0.22,0.059,tit_for_tat,  4135.00)
 rwanda = Country("Rwanda",8.376,Kigali,0.09,0.16,tit_for_tat,  162.30)
 saintkits = Country("Saint Kitts", 0.917, Basseterre, 0.17, 0.143, tit_for_tat, 16)
 saintlucia = Country("Saint Lucia",1.379,Castries,0.31,0.125,tit_for_tat,  24.90)
-saintvincent = Country("Saint Vincent and the Grenadines",0.59,Kingstown,0.163424125,0.13,tit_for_tat,  19.75)
+saintvincent = Country("Saint Vincent and the Grenadines",0.771,Kingstown,0.59,0.13,tit_for_tat,  19.75)
 samoa = Country("Samoa",0.786,Apia,0.23,0.098,tit_for_tat,  53.29)
 saudiarabia = Country("Saudi Arabia",646.438,Riyadh,0.28,0.055,tit_for_tat,  1466.18)
 senegal = Country("Senegal",14.765,Dakar,0.50,0.092,tit_for_tat,  443.52)
@@ -143,7 +135,6 @@ southkorea = Country("South Korea",1411.246,Seoul,0.34,0.069,tit_for_tat,  316.6
 spain = Country("Spain",1237.255,Madrid,0.21,0.03,tit_for_tat,  711.29)
 srilanka = Country("Sri Lanka",81.322,SriJayawardenepuraKotte,0.33,0.071,tit_for_tat,  256.14)
 suriname = Country("Suriname",3.621, Paramaribo, 1.38, 0.143, tit_for_tat, 405)
-#swaziland
 sweden = Country("Sweden",511,Stockholm,0.67,0.03,tit_for_tat,   668.89)
 switzerland = Country("Switzerland",668.851,Bern,0.45,0.02,tit_for_tat,  203.20 )
 taiwan = Country("Taiwan", 579.302, Taipei, 0.55, 0.022, tit_for_tat, 190)
@@ -160,16 +151,16 @@ ukraine = Country("Ukraine",93.27,Kiev,0.45,0.025,tit_for_tat,  776.88)
 unitedarab = Country("United Arab Emirates",348.743,AbuDhabi,0.28,0.038,tit_for_tat,  289.14)
 unitedkingdom = Country("United Kingdom",2647.898,London,0.15,0.03,tit_for_tat,  493.57)
 unitedstates = Country("United States",18624.475,Washington,0.08,0.024,defect,  3135.52)
-uruguay = Country("Uruguay",52.42,Montevideo,0.107592522,0.36,tit_for_tat,  419.79)
-vanuatu = Country("Vanuatu", 0.774,PortVila, 0.171834625, 0.68, tit_for_tat, 110)
+uruguay = Country("Uruguay",52.42,Montevideo,0.36,0.096,tit_for_tat,  419.79)
+vanuatu = Country("Vanuatu", 0.774,PortVila,0.68, 0.075, tit_for_tat, 110)
 venezuela = Country("Venezuela", 371.337, Caracas, 0.09, 0.127, tit_for_tat, 955)
 vietnam = Country("Vietnam",202.616,Hanoi,0.91,0.057,tit_for_tat,  575.30)
 yemen = Country("Yemen",27.318,Sanaa,0.06,0.062,tit_for_tat,  726.62)
 zambia = Country("Zambia",19.551,Lusaka,0.54,0.118,tit_for_tat,  867.53)
 zimbabwe = Country("Zimbabwe",16.289,Harare,0.17,0.123,tit_for_tat,  625.11)
-eu = Country("European Union",19044,Brussels,0.12,0.03, generoustft, 2116)
+eu = Country("European Union",16397.98,Brussels,0.12,0.03, tit_for_tat, 2116)
 
-  
+
 
 AllCountries =[botswana,albania,angola,antigua,argentina,armenia,australia,bahrain,bangladesh,barbados,belize,benin,boliva,brazil,brunei,
                burkina,burundi,cambodia,cameroon,canada,capeverde,centralar,chad,chile,china,colombia,costarica,ivorycoast,cuba,
@@ -180,4 +171,4 @@ AllCountries =[botswana,albania,angola,antigua,argentina,armenia,australia,bahra
                russia,rwanda,saintkits,saintlucia,saintvincent,samoa,saudiarabia,senegal,seychelles,sierraleone,singapore,
                solomonislands,southafrica,southkorea,srilanka,suriname,switzerland,taiwan,tajikistan,tanzania,thailand,togo,tongo,
                trinidad,tunisia,turkey,uganda,ukraine,unitedarab,unitedstates,uruguay,vanuatu,venezuela,vietnam,
-               yemen,zambia,zimbabwe,eu]
+yemen,zambia,zimbabwe,eu]

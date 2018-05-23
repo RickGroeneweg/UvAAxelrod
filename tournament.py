@@ -21,7 +21,7 @@ Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinS
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
 
-    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 10000):
+    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 5000):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []

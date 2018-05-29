@@ -83,7 +83,7 @@ def draw_pie(ax, lat, lon, outcomeDict, size=600):
     ax.scatter(lon, lat, marker = (xy3, 0), s=s3 **2 * size, facecolor = 'blue')
     ax.scatter(lon, lat, marker = (xy4, 0), s=s4 **2 * size, facecolor = 'black')
 
-def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
+def draw_stack(tournament, rounds= 0, cmap = 'gist_rainbow', xSize = 20, ySize = 20):
     if rounds ==0:
         rounds = tournament.rounds
         numberOfStrategies = len(tournament.strategyList)
@@ -93,22 +93,22 @@ def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
     cmap = plt.get_cmap(cmap)
     colors = [cmap(value/(numberOfStrategies-1)) for value in range(numberOfStrategies)]
 
-    strategyListStrats = [s.name() for s in tournament.strategyList]
+
     for country in tournament.countries:
         for i, (n, strat) in enumerate(country.evolution[:-1]):
 
-            row = strategyListStrats.index(strat)
+            row = tournament.strategyList.index(strat)
             next_n = country.evolution[i+1][0]
             matrix[row, n:next_n] += country.m
         #last strategy
         last_evo, last_strategy = country.evolution[-1]
-        row = strategyListStrats.index(last_strategy)
+        row = tournament.strategyList.index(last_strategy)
         matrix[row, last_evo:] += country.m
 
     stack = np.vstack(matrix)
 
     fig, ax = plt.subplots(figsize =(xSize, ySize))
-    ax.stackplot(range(rounds+1), *matrix, labels=strategyListStrats, colors= colors) #this needs to be adjusted for the number of strategies
+    ax.stackplot(range(rounds+1), *matrix, labels=tournament.strategyList, colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
     plt.ylabel('Market share', fontsize='xx-large')
     plt.xlabel('Round number', fontsize='xx-large')
@@ -116,6 +116,7 @@ def draw_stack(tournament, rounds= 0, cmap = 'jet', xSize = 20, ySize = 20):
 
 def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10):
 
+    fig, ax = plt.subplots(figsize =(xSize, ySize))
     cmap = plt.get_cmap(cmap)
 
     if selecting:
@@ -125,10 +126,11 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
     else:
         countries = tournament.countries
 
-    fig, ax = plt.subplots(figsize =(xSize, ySize))
+
 
     for country in countries:
         draw_country_line(country, cmap, tournament.strategyList)
+        plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, country.fitnessHistory[-1]))
 
     #ax.legend(loc=5)
     plt.ylabel('Fitness', fontsize='xx-large')
@@ -136,9 +138,9 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
     plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
 
 
-def draw_country_line(country, cmap, strategyListfunctions): #need to add a color legend and color line option
+def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
 
-    strategyList = [s.name() for s in strategyListfunctions]
+
     colors = [cmap(value/(len(strategyList)-1)) for value in range(len(strategyList))]
 
     colorDict = dict(zip(strategyList, colors))
@@ -155,7 +157,7 @@ def draw_country_line(country, cmap, strategyListfunctions): #need to add a colo
     Xend = len(country.fitnessHistory)
     lastColor = colorDict[country.evolution[-1][1]]
     plt.plot(range(Xstart, Xend), country.fitnessHistory[Xstart:], color = lastColor)
-    plt.annotate(country.name, xy=(Xend, country.fitnessHistory[-1]))
+
 
 def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, selecting = None, filtering = None): #To do: add selecting
     '''draws for every country the evolution of its stategy'''
@@ -189,7 +191,7 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, sele
     # colormap used by imshow
     colors = [ im.cmap(im.norm(value)) for value in range(len(tournament.strategyList))]
     # create a patch (proxy artist) for every color
-    patches = [ mpatches.Patch(color=colors[i], label=tournament.strategyList[i].name()) for i in range(len(tournament.strategyList)) ]
+    patches = [ mpatches.Patch(color=colors[i], label=tournament.strategyList[i]) for i in range(len(tournament.strategyList)) ]
     # put those patched as legend-handles into the legend
     plt.legend(handles=patches, bbox_to_anchor=(0.99,0.99),ncol=1, fontsize='xx-large')
 
@@ -199,8 +201,8 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, sele
 def make_evolution_matrix(tournament, countries, rounds):
     '''helper function to draw_evo'''
 
-    strategyListStrats = [s.name() for s in tournament.strategyList]
-    valueDict = dict(zip(strategyListStrats, range(len(tournament.strategyList)))) #{Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
+
+    valueDict = dict(zip(tournament.strategyList, range(len(tournament.strategyList)))) #{Collaborate: 0, Defect: 1, TitForTat: 2, Grudge: 3, RandomMove: 4, Alternate: 5}
     result = np.zeros((len(countries), rounds+1))
 
     for country_index, country in enumerate(countries):
@@ -234,9 +236,9 @@ def draw_round_robin_matrix(tournament, texting = False, selecting = [], filteri
         countryNames = [str(country) for country in tournament.countries if country not in filtering ]
     else:
         countryNames = allCountryNames
-    print(countryNames)
+    #print(countryNames)
     indices = [allCountryNames.index(cn) for cn in countryNames]
-    print(indices)
+    #print(indices)
     #helper method should end here
 
     matrix = tournament.matchResultsMatrix[indices, :][:, indices] #matrix with only rows and columns of indexed countries
@@ -326,7 +328,7 @@ def draw_country_marker(ax, country, colorIndicator="out", sizeIndicator="m", fa
     if colorIndicator == "out":
         draw_pie(ax, country.loc[0], country.loc[1], country.outcomeDict, size = marker_size(country, sizeIndicator, factor, change = change))
     elif sizeIndicator == "strat":
-        mymarker = marker_style(country.strategy.name())
+        mymarker = marker_style(country.strategy.strat_enum)
         mylabel = str(country.strategy)
         ax.scatter(country.loc[1], country.loc[0], marker = mymarker, label = mylabel, s = 3 * factor ,c = marker_color(country, colorIndicator, change), cmap =plt.get_cmap('gnuplot'), vmax = cmax, vmin = cmin)
     else:

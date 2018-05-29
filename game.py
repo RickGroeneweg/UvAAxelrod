@@ -1,9 +1,9 @@
-
-
 import numpy as np
-from .payoff_functions import reward, sucker, temptation, punishment, selfreward
-from .country import *
 from .action import *
+from .payoff_functions import reward, sucker, temptation, punishment, selfreward
+from .strategies import *
+#from .country import *
+
 from geopy import distance
 from math import sqrt, log
 
@@ -21,7 +21,7 @@ class SelfGame:
         self.country.fitness = self.country.fitness + self.reward
 
 class Game:
-    '''Here the values of payoff functions are stored'''
+    '''Here the values of payoff functions are stored, and the history'''
 
     def __init__(self, country1, country2, distance_function = lambda x: x):
 
@@ -41,28 +41,30 @@ class Game:
         self.punishment1 = punishment(self.country1, self.country2,self.fdistance)
         self.punishment2 = punishment(self.country1, self.country2,self.fdistance)
 
+        self.country1moves = []
+        self.country2moves = []
+
     def __str__(self):
         return self.country1.name + " vs " + self.country2.name
 
 
     def play(self, surveillancePenalty = False): #should this function really return something
         '''returns moves the countries make, and update attributes'''
-        move_country1 = self.country1.strategy(self.country1, self.country2) #*kwargs?
-        move_country2 = self.country2.strategy(self.country2, self.country1)
+        move_country1 = self.country1.strategy(self) #**kwargs?
+        move_country2 = self.country2.strategy(self)
+
 
         outcome = to_outcome(move_country1, move_country2)
         self.country1.outcomeDict[outcome[0]] += 1
         self.country2.outcomeDict[outcome[1]] += 1
 
 
-        self.country1.moves.append(move_country1)
-        self.country2.moves.append(move_country2)
-        self.country1.history.append(outcome[0])
-        self.country2.history.append(outcome[1])
+        self.country1moves.append(move_country1)
+        self.country2moves.append(move_country2)
 
         (self.country1.fitness, self.country2.fitness) = self.update_fitness(outcome[0], surveillancePenalty = surveillancePenalty)
 
-        return (move_country1, move_country2)
+
 
 
     def update_fitness(self, outcome_for_countr1, surveillancePenalty = False):
@@ -86,8 +88,8 @@ class Game:
 
         if surveillancePenalty:
             surveillancePenaltyDict = surveillancePenaltyDict = {Collaborate: 1, Defect: 1, TitForTat: 0.95, Grudge: 0.95, RandomMove: 1, Alternate: 1, GenerousTFT: 0.95, WinStayLoseShift:1, GenerousTFT: 0.95}
-            fitnessChange1 = (fitnessChange1*surveillancePenaltyDict[self.country1.strategy.name()])
-            fitnessChange2  = (fitnessChange2*surveillancePenaltyDict[self.country2.strategy.name()])
+            fitnessChange1 = (fitnessChange1*surveillancePenaltyDict[self.country1.strategy.strat_enum])
+            fitnessChange2  = (fitnessChange2*surveillancePenaltyDict[self.country2.strategy.strat_enum])
 
 
         updatedFitnessTuple = (self.country1.fitness + fitnessChange1, self.country2.fitness + fitnessChange2)

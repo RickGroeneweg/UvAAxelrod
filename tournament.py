@@ -3,12 +3,13 @@ import math
 from itertools import combinations
 #import random # don't use this library, use np.random instead. Otherwise it messes up the seed
 from math import sqrt
+from .action import *
 
 from .country import *
 from .game import *
 from .strategies import *
 from .match import *
-from .action import *
+
 
 import matplotlib.pyplot as plt
 #from mpl_toolkits.basemap import Basemap
@@ -18,17 +19,16 @@ import matplotlib.patches as mpatches
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
 
+DefaultNoise = 0.1
+
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
 
-    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 5000):
+    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 5000, strategyList = [Collaborate, Defect, TitForTat, GenerousTFT]):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []
         self.rounds = rounds
-
-
-
 
         if initialFitnessEqualsM:
             for country in self.countries:
@@ -40,7 +40,7 @@ class Tournament:
 
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
-        self.strategyList = [collaborate, defect, tit_for_tat, generoustft]
+        self.strategyList = strategyList
 
     def reset_after_tournament(self): #not yet tested
         for country in self.countries:
@@ -107,7 +107,7 @@ class Tournament:
 
 
             if self.endOfEvolution(self.countries):
-                print("The Process ended in {} rounds\n Winning strategy: {}".format(n+1, str(self.countries[0].strategy.name())))
+                print("The Process ended in {} rounds\n Winning strategy: {}".format(n+1, str(self.countries[0].strategy.strat_enum)))
                 self.rounds = n+1 #is the +1 correct? need to test
                 break;
 
@@ -128,12 +128,13 @@ class Tournament:
         N = len(self.countries)
         eliminate_index = np.random.randint(N)
         losingCountry = self.countries[eliminate_index]
-        losingStrategyStr = str(losingCountry.strategy.name())
+        losingStrategyStr = str(losingCountry.strategy.strat_enum)
 
         #is there a mutation in stead?
         mutation = bool(np.random.binomial(1, mutationRate))
         if mutation:
-            winningStrategy = np.random.choice(strategyList)
+            winningStratEnum = np.random.choice(strategyList)
+            winningStrategyFunction = winningStratEnum.toFunction()
             winningCountry = "Random Mutation"
         else:
             #probabilites cannot be negative, so all negative fitnesses are pretended to be 0
@@ -144,17 +145,18 @@ class Tournament:
 
             reproduce_index = np.random.choice(range(N), p=probabilities)
             winningCountry = self.countries[reproduce_index]
-            winningStrategy = winningCountry.strategy
+            winningStratEnum = winningCountry.strategy.strat_enum
+            winningStrategyFunction = winningCountry.strategy.function
 
         #append to country's evolution list
-        losingCountry.evolution.append((roundNum, winningStrategy.name()))
+        losingCountry.evolution.append((roundNum, winningStratEnum))
 
-        losingCountry.strategy = winningStrategy
+        losingCountry.strategy = Strategy(winningStratEnum, winningStrategyFunction, losingCountry)
         if printing:
-            print("strategy " + str(losingCountry) + " (" + losingStrategyStr + ") "+ "changed to strategy " + str(winningCountry) +  " (" + str(winningStrategy.name()) + ")")
+            print("strategy " + str(losingCountry) + " (" + losingStrategyStr + ") "+ "changed to strategy " + str(winningCountry) +  " (" + str(winningStratEnum) + ")")
 
     def get_payoff_value(self, country1, country2, outcome1):
-
+        '''To see the value country1 gets as payoff from a game against country2 with outcome1'''
         if country1 == country2:
             if outcome1 == R:
                 index = self.countries.index(country1)
@@ -200,6 +202,24 @@ class Tournament:
                 raise Exception
 
     @staticmethod
-    def init_strategy(strategy, *countries):
+    def init_strategy(strat_enum, *countries, noise = DefaultNoise):
         for country in countries:
-            country.init_strategy(strategy)
+            country.init_strategy(strat_enum, noise = noise)
+
+    def getGameMoves(self, country1, country2):
+        index1 = self.countries.index(country1)
+        index2 = self.countries.index(country2)
+
+        if (index1 < index2):
+            match = self.matches[(index1, index2)]
+            game = match.game
+            outcomes1 = game.country1moves
+            outcomes2 = game.country2moves
+        elif (index2 < index1):
+            match = self.matches[(index2, index1)]
+            game = match.game
+            outcomes2 = game.country1moves
+            outcomes1 = game.country2moves
+        else: raise Exception
+
+        print([(m.name, n.name) for (m,n) in list(zip(outcomes1, outcomes2))])

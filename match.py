@@ -1,4 +1,4 @@
-
+from .action import *
 from .game import *
 
 class SelfMatch:
@@ -15,7 +15,7 @@ class SelfMatch:
 
         self.changeInFitness = self.selfgame.country.fitness - initialFitness
 
-        self.selfgame.country.moves = [] #resetting de country's moves for the next match
+
 
 
 class Match:
@@ -43,9 +43,3 @@ class Match:
 
         if printing: print("match played:" + self.__str__())
         self.changeInFitness = (self.game.country1.fitness - initialFitness[0], self.game.country2.fitness - initialFitness[1])
-
-
-
-        #reset the moves that were stored in the game object.
-        self.game.country1.moves = []
-        self.game.country2.moves = []

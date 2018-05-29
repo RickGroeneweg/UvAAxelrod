@@ -1,12 +1,12 @@
-from .action import Outcome
-from .strategies import *
+from .action import *
+from .strategies import Strategy
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 
 class Country:
     '''All features of countries are stored here'''
 
-    def __init__(self, name, m, loc, e, i, strategy, area):
+    def __init__(self, name, m, loc, e, i, area):
         self.name = name
         self.m = m
         self.loc = loc
@@ -14,27 +14,26 @@ class Country:
         self.i = i
         self.fitness = 0
         self.fitnessHistory = [0]
-        self.moves = []
         self.history = []
-        self.strategy = strategy #a function (self, opponent, **kwargs) -> [C,D]
+        self.strategy = None
         self.area = area
         self.outcomeDict = {R: 0, T: 0, S: 0, P: 0}
-        self.evolution = [(0, self.strategy.name())]
+        self.evolution = []
 
     def __str__(self):
         return self.name
     def __repr__(self):
         return self.name
 
-    def init_strategy(self, strategy):
-        self.strategy = strategy
-        self.evolution = [(0,self.strategy.name())]
+    def init_strategy(self, strat_enum, noise = 0.0):
+        function = strat_enum.toFunction()
+        self.strategy = Strategy(strat_enum, function, self)
+        self.evolution = [(0,self.strategy.strat_enum)]
 
     def reset_after_tournament(self, strategy):
         self.fitness = 0
         self.fitnessHistory = [0]
-        self.moves = []
         self.history = []
-        self.strategy = strategy #a function (self, opponent, **kwargs) -> [C,D]
+        self.strategy = None #a function (self, opponent, **kwargs) -> [C,D]
         self.outcomeDict = {R: 0, T: 0, S: 0, P: 0}
-        self.evolution = [(0, self.strategy.name())]
+        self.evolution = []

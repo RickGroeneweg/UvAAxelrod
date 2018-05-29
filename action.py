@@ -1,5 +1,6 @@
 from enum import Enum
 import numpy as np
+
 #import random
 
 class Action(Enum): #C for Collaborate, D for Defect
@@ -14,6 +15,9 @@ class Action(Enum): #C for Collaborate, D for Defect
                 return Action.C
         else:
             return self
+    def __str__(self):
+        return self.name
+
 
 
 class Outcome(Enum): #R for Reward, T for Temptation, S for Sucker, P for Penalty
@@ -22,25 +26,19 @@ class Outcome(Enum): #R for Reward, T for Temptation, S for Sucker, P for Penalt
     S=2
     P=3
 
+    def switch(self):
+        switchDict = {Outcome.R: Outcome.R, Outcome.T: Outcome.S, Outcome.S: Outcome.T, Outcome.P: Outcome.P}
+        return switchDict[self]
+
+
+
+
 class PlottingVariable(Enum):
     M = 0
     Fitness = 1
     FitnessChange = 2
     Strategy = 3
 
-class Strat(Enum):
-    Collaborate = 0
-    Defect = 1
-    TitForTat = 2
-    Grudge =3
-    RandomMove = 4
-    Alternate = 5
-    GenerousTFT = 6
-    WinStayLoseShift = 7
-    Contrite = 8
-
-    def __str__(self):
-        return self.name
 
 def to_outcome(act1, act2):
     '''from inputs (Action, Action), outputs (Outcome, Outcome)'''

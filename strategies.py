@@ -1,7 +1,26 @@
-from .country import *
+from enum import Enum
 from .action import *
-#import random
-import functools
+
+
+
+
+class Strat(Enum):
+    Collaborate = 0
+    Defect = 1
+    TitForTat = 2
+    Grudge =3
+    RandomMove = 4
+    Alternate = 5
+    GenerousTFT = 6
+    WinStayLoseShift = 7
+    Contrite = 8
+
+    def toFunction(self):
+        functioDict = {Collaborate: collaborate, Defect: defect, TitForTat: tit_for_tat, Grudge: grudge, RandomMove: random_move, Alternate: alternate, GenerousTFT: generoustft, WinStayLoseShift: win_stay_lose_shift, Contrite: contrite_titfortat}
+        return functioDict[self]
+
+    def __str__(self):
+        return self.name
 
 C, D = Action.C, Action.D
 Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift,  = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
@@ -9,86 +28,99 @@ Contrite = Strat.Contrite
 
 DefaultNoise = 0.1
 
-def give_strat (strat):
-    '''A decorator function, that adds a Strat (Enum) method to a function object (like a strategy)'''
-    def function_with_strat(f_without):
-        class Function_w_name:
-            def __call__(self, *args, **kwargs):
-                #return behaviour of function unchanged
-                return f_without(*args, **kwargs)
-            def name(self):
-                return strat
-        return functools.wraps(function_with_strat)(Function_w_name())
-    return function_with_strat
+class Strategy:
+    def __init__(self, strat_enum, function, country, noise = DefaultNoise):
+        self.strat_enum = strat_enum
+        self.function = function
+        self.country = country
+        self.noise = noise
 
-@give_strat(Collaborate)
-def collaborate(country1, country2, noise=DefaultNoise):
+    def __str__(self):
+        return "<" + str(self.strat_enum) + " by " + str(self.country) + ">"
+
+    def __call__(self, game):
+        switchPerspective = (self.country == game.country2 )
+        if switchPerspective:
+            selfmoves = game.country2moves
+            othermoves = game.country1moves
+        elif (self.country == game.country1):
+            selfmoves= game.country1moves
+            othermoves = game.country2moves
+        else:
+            raise Exeption
+
+
+
+        return self.function(selfmoves, othermoves, noise = self.noise)
+
+
+def collaborate(selfmoves, othermoves, noise=DefaultNoise):
     '''Only collaborates'''
     return C.stoc(noise)
 
-@give_strat(Defect)
-def defect(country1, country2, noise=DefaultNoise):
+def defect(selfmoves, othermoves, noise=DefaultNoise):
     '''Only defects'''
     return D.stoc(noise)
 
-@give_strat(TitForTat)
-def tit_for_tat(country1, country2, noise=DefaultNoise):
-    '''Starts the match by collaborating, then plays the move the opponent played last turn'''
-    if country2.moves == []: # not country2.moves more efficient, but needs checking
-        return C.stoc(noise)
-    else: return country2.moves[-1].stoc(noise)
 
-@give_strat(GenerousTFT)
-def generoustft(country1, country2, noise=DefaultNoise):
-    if country2.moves == []: # not country2.moves more efficient, but needs checking
+def tit_for_tat(selfmoves, othermoves, noise=DefaultNoise):
+    '''Starts the match by collaborating, then plays the move the opponent played last turn'''
+    if othermoves == []: # not country2.moves more efficient, but needs checking
         return C.stoc(noise)
-    elif country2.moves[-1] == C:
+    else: return othermoves[-1].stoc(noise)
+
+
+def generoustft(selfmoves, othermoves, noise=DefaultNoise):
+    if othermoves == []: # not country2.moves more efficient, but needs checking
+        return C.stoc(noise)
+    elif othermoves[-1] == C:
         return C.stoc(noise)
     else:
         return D.stoc(0.3).stoc(noise)
 
-@give_strat(Grudge)
-def grudge(country1, country2, noise=DefaultNoise):
+
+def grudge(selfmoves, othermoves, noise=DefaultNoise): #DOES NOT WORK
     #Starts collaborating, but once the opponent defects, it will defect for the rest of the match #need thinking about noise
-    if country1.moves == [] or country2.moves == []: return C.stoc(noise)
+    raise Exeption("Ask Vaclav how grudge should deal with noise")
+    if selfmoves == [] or othermoves == []: return C.stoc(noise)
     elif country2.moves[-1] == D or country1.moves[-1] == D:
         return D.stoc(noise)
     else: return C.stoc(noise)
 
-@give_strat(RandomMove)
-def random_move(country1, country2, noise=DefaultNoise):
+
+def random_move(selfmoves, othermoves, noise=DefaultNoise):
     #returns a random move with uniform distribution
     rnd = np.random.binomial(1,1/2)
     if rnd == 0:
         return C.stoc(noise)
     else: return D.stoc(noise)
 
-@give_strat(Alternate)
-def alternate(country1, country2, noise=DefaultNoise):
+
+def alternate(selfmoves, othermoves, noise=DefaultNoise):
     #alternates between collaborating dan defecting
-    if country1.moves == []:
+    if selfmoves == []:
         return C.stoc(noise)
-    elif country1.moves[-1] == C:
+    elif selfmoves[-1] == C:
         return D.stoc(noise)
     else: return C.stoc(noise)
 
-@give_strat(WinStayLoseShift)
-def win_stay_lose_shift(country1, country2, noise=DefaultNoise):
-    if country2.moves ==[]:
+
+def win_stay_lose_shift(selfmoves, othermoves, noise=DefaultNoise):
+    if selfmoves ==[]:
         return C.stoc(noise)
-    elif country2.moves[-1]==country1.moves[-1]:
+    elif othermoves[-1]==selfmoves[-1]:
         return C.stoc(noise)
     else:
         return D.stoc(noise)
 
-@give_strat(Contrite)
-def contrite_titfortat(country1,country2):
+
+def contrite_titfortat(selfmoves,othermoves, noise= DefaultNoise):
     if len(country1.moves <= 1):
-        return tit_for_tat(country1,country2)
-    elif country1.moves[-2] == D and countrty2.moves[-2] == C:
+        return tit_for_tat(selfmoves,othermoves, noise = noise)
+    elif selfmoves[-2] == D and othermoves[-2] == C:
         return C
     else:
-        return tit_for_tat(country1, country2)
+        return tit_for_tat(selfmoves, othermoves)
 
 #HOW TO ADD A STRATEGY
 #-create a new Strat(Enum) in action.py

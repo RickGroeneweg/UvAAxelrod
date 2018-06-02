@@ -49,9 +49,10 @@ class Strategy:
         else:
             raise Exeption
 
-
-
         return self.function(selfmoves, othermoves, noise = self.noise)
+
+    def __eq__(self, other):
+        return self.strate_enum == other.strat_enum
 
 
 def collaborate(selfmoves, othermoves, noise=DefaultNoise):

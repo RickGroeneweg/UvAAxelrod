@@ -102,7 +102,13 @@ class Tournament:
             for country in self.countries:
                 country.fitnessHistory.append(country.fitness)
 
-            if printing: print("Round {} of tournament played".format(n+1))
+            if printing:
+                print("Round {} of tournament played".format(n+1))
+                strategyTuples = []
+                for strategy in self.strategyList:
+                    nrCountriesWithThisStrategy = len([c for c in self.countries if c.strategy.strat_enum == strategy])
+                    strategyTuples.append((str(strategy), nrCountriesWithThisStrategy))
+                print("number of countries per strategy:" + str(strategyTuples))
 
 
 
@@ -115,9 +121,9 @@ class Tournament:
 
     @staticmethod
     def endOfEvolution(countries):
-        strategy1 = str(countries[0].strategy)
+        strategy1 = countries[0].strategy.strat_enum
         for country in countries[1:]:
-            if str(country.strategy) != strategy1:
+            if country.strategy.strat_enum != strategy1:
                 return False
         print("All strategies are the same")
         return True
@@ -153,7 +159,7 @@ class Tournament:
 
         losingCountry.strategy = Strategy(winningStratEnum, winningStrategyFunction, losingCountry)
         if printing:
-            print("strategy " + str(losingCountry) + " (" + losingStrategyStr + ") "+ "changed to strategy " + str(winningCountry) +  " (" + str(winningStratEnum) + ")")
+            print("strategy " + str(losingCountry) + " (" + losingStrategyStr + ") "+ " -> " + str(winningCountry) +  " (" + str(winningStratEnum) + ")")
 
     def get_payoff_value(self, country1, country2, outcome1):
         '''To see the value country1 gets as payoff from a game against country2 with outcome1'''

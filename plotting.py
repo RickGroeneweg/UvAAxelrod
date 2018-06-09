@@ -1,7 +1,7 @@
 
 import numpy as np
 import math
-from itertools import combinations
+from itertools import combinations#, izip
 from math import sqrt,log
 
 from .country import *
@@ -114,7 +114,7 @@ def draw_stack(tournament, rounds= 0, cmap = 'gist_rainbow', xSize = 20, ySize =
     plt.xlabel('Round number', fontsize='xx-large')
     plt.title('Evolution of Strategies in Heterogenous Populations', fontsize='xx-large')
 
-def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10):
+def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10, delta = False):
 
     fig, ax = plt.subplots(figsize =(xSize, ySize))
     cmap = plt.get_cmap(cmap)
@@ -127,15 +127,30 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
         countries = tournament.countries
 
 
-
-    for country in countries:
-        draw_country_line(country, cmap, tournament.strategyList)
-        plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, country.fitnessHistory[-1]))
+    if delta == False:
+        for country in countries:
+            draw_country_line(country, cmap, tournament.strategyList)
+            plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, country.fitnessHistory[-1]))
+    else:
+        for country in countries:
+            draw_country_line_delta(country, cmap, tournament.strategyList)
+            plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, (country.fitnessHistory[-1] - country.fitnessHistory[-2])))
 
     #ax.legend(loc=5)
-    plt.ylabel('Fitness', fontsize='xx-large')
+    if delta == False:
+        plt.ylabel('Fitness', fontsize='xx-large')
+    else:
+        plt.ylabel('FitnessDelta', fontsize = 'xx-large')
     plt.xlabel('Rounds', fontsize='xx-large')
     plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
+
+
+def draw_country_line_delta(country, cmap, strategyList):
+    fitnessHistory = country.fitnessHistory
+    fitnessDeltas =[0]
+    for i in range(len(fitnessHistory)-1):
+        fitnessDeltas.append(fitnessHistory[i+1] - fitnessHistory[i])
+    plt.plot(fitnessDeltas)
 
 
 def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
@@ -147,11 +162,13 @@ def draw_country_line(country, cmap, strategyList): #need to add a color legend 
 
     le = len(country.evolution)
 
+
     for evo_nr in range(le-1):
         Xstart = country.evolution[evo_nr][0]
-        Xend = country.evolution[evo_nr+1][0] +1 #number +1 correct?
+        Xend = country.evolution[evo_nr+1][0] +1
         newColor = colorDict[country.evolution[evo_nr][1]]
         plt.plot(range(Xstart, Xend ), country.fitnessHistory[Xstart: Xend], color = newColor)
+
 
     Xstart = country.evolution[-1][0]
     Xend = len(country.fitnessHistory)

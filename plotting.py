@@ -153,6 +153,8 @@ def draw_country_line_delta(country, cmap, strategyList):
     plt.plot(fitnessDeltas)
 
 
+
+
 def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option
 
 

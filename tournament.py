@@ -24,7 +24,7 @@ DefaultNoise = 0.1
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
 
-    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 5000, strategyList = [Collaborate, Defect, TitForTat, GenerousTFT]):
+    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 5000, strategyList = [Collaborate, GenerousTFT, TitForTat, Defect]):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []
@@ -58,7 +58,7 @@ class Tournament:
         size = len(self.countries)
         self.matchResultsMatrix = np.zeros((size, size))
 
-    def play(self, printing = True, turns = 1, changingStrategy = True, mutationRate = 0.1 , playingThemselves = False, nrStrategyChanges = 1, distance_function = lambda x: x, surveillancePenalty = False):
+    def play(self, printing = True, turns = 1, changingStrategy = True, mutationRate = 0.1 , playingThemselves = False, playingEachOther= True, nrStrategyChanges = 1, distance_function = lambda x: x, surveillancePenalty = False):
         '''plays the tournament'''
 
 
@@ -72,11 +72,12 @@ class Tournament:
 
 
         #now we initialize all matches between countries
-        all_combinations = list(combinations(range(len(self.countries)), 2)) #first one always lower
-        for (a, b) in all_combinations:
-            newGame = Game(self.countries[a], self.countries[b], distance_function = distance_function)
-            newMatch = Match(newGame)
-            self.matches[(a,b)]= newMatch
+        if playingEachOther:
+            all_combinations = list(combinations(range(len(self.countries)), 2)) #first one always lower
+            for (a, b) in all_combinations:
+                newGame = Game(self.countries[a], self.countries[b], distance_function = distance_function)
+                newMatch = Match(newGame)
+                self.matches[(a,b)]= newMatch
 
 
 
@@ -90,9 +91,10 @@ class Tournament:
                     self.matchResultsMatrix[i,i] += selfMatch.changeInFitness
 
             #next the countries play against each other
-            for (a,b), match in self.matches.items():
-                match.play(turns = turns, surveillancePenalty = surveillancePenalty)
-                (self.matchResultsMatrix[a, b], self.matchResultsMatrix[b, a]) = (self.matchResultsMatrix[a, b]+match.changeInFitness[0], self.matchResultsMatrix[b, a]+ match.changeInFitness[1])
+            if playingEachOther:
+                for (a,b), match in self.matches.items():
+                    match.play(turns = turns, surveillancePenalty = surveillancePenalty)
+                    (self.matchResultsMatrix[a, b], self.matchResultsMatrix[b, a]) = (self.matchResultsMatrix[a, b]+match.changeInFitness[0], self.matchResultsMatrix[b, a]+ match.changeInFitness[1])
 
 
             if changingStrategy:

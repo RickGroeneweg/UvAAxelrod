@@ -114,7 +114,7 @@ def draw_stack(tournament, rounds= 0, cmap = 'gist_rainbow', xSize = 20, ySize =
     plt.xlabel('Round number', fontsize='xx-large')
     plt.title('Evolution of Strategies in Heterogenous Populations', fontsize='xx-large')
 
-def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10, delta = False):
+def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10, delta = False, wholePopulation = False):
 
     fig, ax = plt.subplots(figsize =(xSize, ySize))
     cmap = plt.get_cmap(cmap)
@@ -127,15 +127,18 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
         countries = tournament.countries
 
 
-    if delta == False:
+    if delta == False and wholePopulation == False:
         for country in countries:
             draw_country_line(country, cmap, tournament.strategyList)
             plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, country.fitnessHistory[-1]))
-    else:
+    elif delta == True:
         for country in countries:
             draw_country_line_delta(country, cmap, tournament.strategyList)
             plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, (country.fitnessHistory[-1] - country.fitnessHistory[-2])))
-
+    elif delta == False and wholePopulation == True:
+        draw_wholePopulation_line(countries)
+            
+            
     #ax.legend(loc=5)
     if delta == False:
         plt.ylabel('Fitness', fontsize='xx-large')
@@ -144,15 +147,28 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
     plt.xlabel('Rounds', fontsize='xx-large')
     plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
 
-
+def draw_wholePopulation_line(countries):
+    listOfFitnesses = []
+    delta = []
+    def calculate_entire_fitness(roundNumber): #Give entire fitness in the population at roundNumber
+        result = 0
+        for country in countries:
+            result += country.fitnessHistory[roundNumber]
+        return result
+    
+    for round in range(len(countries[0].fitnessHistory)):
+        listOfFitnesses.append(calculate_entire_fitness(round))
+           
+    delta = [listOfFitnesses [i+1]-listOfFitnesses [i] for i in range(len(listOfFitnesses)-1)]
+        
+    plt.plot(delta)
+    
 def draw_country_line_delta(country, cmap, strategyList):
     fitnessHistory = country.fitnessHistory
     fitnessDeltas =[0]
-    for i in range(len(fitnessHistory)-1):
+    for i in range(len(fitnessHistory)-1): 
         fitnessDeltas.append(fitnessHistory[i+1] - fitnessHistory[i])
     plt.plot(fitnessDeltas)
-
-
 
 
 def draw_country_line(country, cmap, strategyList): #need to add a color legend and color line option

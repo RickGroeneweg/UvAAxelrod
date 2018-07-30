@@ -132,14 +132,17 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
         for country in countries:
             draw_country_line(country, cmap, tournament.strategyList)
             plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, country.fitnessHistory[-1]))
-    elif delta == True:
+    elif delta == True and wholePopulation == False:
         for country in countries:
             draw_country_line_delta(country, cmap, tournament.strategyList)
             plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, (country.fitnessHistory[-1] - country.fitnessHistory[-2])))
-    elif delta == False and wholePopulation == True:
-        draw_wholePopulation_line(countries)
-            
-            
+    elif wholePopulation == True:
+        plt.plot(wholePopulation_fitessList(countries, delta = delta))
+
+
+
+
+
     #ax.legend(loc=5)
     if delta == False:
         plt.ylabel('Fitness', fontsize='xx-large')
@@ -148,7 +151,7 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
     plt.xlabel('Rounds', fontsize='xx-large')
     plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
 
-def draw_wholePopulation_line(countries, xSize = 20, ySize = 10):
+def draw_wholePopulation_line_depricated(countries, xSize = 20, ySize = 10):
 
     fig, ax = plt.subplots(figsize =(xSize, ySize))
 
@@ -160,23 +163,41 @@ def draw_wholePopulation_line(countries, xSize = 20, ySize = 10):
         for country in countries:
             result += country.fitnessHistory[roundNumber]
         return result
-    
+
     for round in range(len(countries[0].fitnessHistory)):
         listOfFitnesses.append(calculate_entire_fitness(round))
-           
+
     delta = [listOfFitnesses [i+1]-listOfFitnesses [i] for i in range(len(listOfFitnesses)-1)]
 
-    plt.plot(delta, linewidth=1, c='black')    
+    plt.plot(delta, linewidth=1, c='black')
     plt.title("Change in Fitness of Whole Population", fontsize = 24)
     plt.xlabel("Number of Rounds", fontsize = 24)
     plt.ylabel("Fitness Level", fontsize = 24)
     plt.tick_params(axis='both',labelsize=14)
 
+def wholePopulation_fitessList(countries, delta = False):
+    def calculate_entire_fitness(roundNumber): #Give entire fitness in the population at roundNumber
+        result = 0
+        for country in countries:
+            result += country.fitnessHistory[roundNumber]
+        return result
+
+    listOfFitnesses = []
+    for round in range(len(countries[0].fitnessHistory)):
+        listOfFitnesses.append(calculate_entire_fitness(round))
+
+    if delta == False:
+        return listOfFitnesses
+    else:
+        return [0] + [(listOfFitnesses[i+1] - listOfFitnesses[i]) for i in range(len(listOfFitnesses)-1)]
+
+
+
 
 def draw_country_line_delta(country, cmap, strategyList):
     fitnessHistory = country.fitnessHistory
     fitnessDeltas =[0]
-    for i in range(len(fitnessHistory)-1): 
+    for i in range(len(fitnessHistory)-1):
         fitnessDeltas.append(fitnessHistory[i+1] - fitnessHistory[i])
     plt.plot(fitnessDeltas)
 

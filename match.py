@@ -7,7 +7,7 @@ class SelfMatch:
         self.changeInFitness = 0
     ##__str__
 
-    def play(self, turns = 12):
+    def play(self, turns = 1):
         initialFitness = self.selfgame.country.fitness
 
         for _ in range(turns):

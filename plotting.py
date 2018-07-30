@@ -83,7 +83,7 @@ def draw_pie(ax, lat, lon, outcomeDict, size=600):
     ax.scatter(lon, lat, marker = (xy3, 0), s=s3 **2 * size, facecolor = 'blue')
     ax.scatter(lon, lat, marker = (xy4, 0), s=s4 **2 * size, facecolor = 'black')
 
-def draw_stack(tournament, rounds= 0, cmap = 'gist_rainbow', xSize = 20, ySize = 20):
+def draw_stack(tournament, rounds= 0, cmap = 'Greys_r', xSize = 20, ySize = 10):
     if rounds ==0:
         rounds = tournament.rounds
         numberOfStrategies = len(tournament.strategyList)
@@ -110,11 +110,12 @@ def draw_stack(tournament, rounds= 0, cmap = 'gist_rainbow', xSize = 20, ySize =
     fig, ax = plt.subplots(figsize =(xSize, ySize))
     ax.stackplot(range(rounds+1), *matrix, labels=tournament.strategyList, colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
-    plt.ylabel('Market share', fontsize='xx-large')
-    plt.xlabel('Round number', fontsize='xx-large')
-    plt.title('Evolution of Strategies in Heterogenous Populations', fontsize='xx-large')
+    plt.ylabel('Market share', fontsize=24)
+    plt.xlabel('Round number', fontsize=24)
+    plt.tick_params(axis='both',labelsize=14)
+    plt.title('Evolution of Strategies in Heterogenous Populations', fontsize=24)
 
-def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_rainbow', xSize = 10, ySize = 10, delta = False, wholePopulation = False):
+def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r', xSize = 10, ySize = 10, delta = False, wholePopulation = False):
 
     fig, ax = plt.subplots(figsize =(xSize, ySize))
     cmap = plt.get_cmap(cmap)
@@ -147,9 +148,13 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'gist_ra
     plt.xlabel('Rounds', fontsize='xx-large')
     plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
 
-def draw_wholePopulation_line(countries):
+def draw_wholePopulation_line(countries, xSize = 20, ySize = 10):
+
+    fig, ax = plt.subplots(figsize =(xSize, ySize))
+
     listOfFitnesses = []
     delta = []
+
     def calculate_entire_fitness(roundNumber): #Give entire fitness in the population at roundNumber
         result = 0
         for country in countries:
@@ -160,9 +165,14 @@ def draw_wholePopulation_line(countries):
         listOfFitnesses.append(calculate_entire_fitness(round))
            
     delta = [listOfFitnesses [i+1]-listOfFitnesses [i] for i in range(len(listOfFitnesses)-1)]
-        
-    plt.plot(delta)
-    
+
+    plt.plot(delta, linewidth=1, c='black')    
+    plt.title("Change in Fitness of Whole Population", fontsize = 24)
+    plt.xlabel("Number of Rounds", fontsize = 24)
+    plt.ylabel("Fitness Level", fontsize = 24)
+    plt.tick_params(axis='both',labelsize=14)
+
+
 def draw_country_line_delta(country, cmap, strategyList):
     fitnessHistory = country.fitnessHistory
     fitnessDeltas =[0]
@@ -194,7 +204,7 @@ def draw_country_line(country, cmap, strategyList): #need to add a color legend 
     plt.plot(range(Xstart, Xend), country.fitnessHistory[Xstart:], color = lastColor)
 
 
-def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, selecting = None, filtering = None): #To do: add selecting
+def draw_evo(tournament, rounds =0 , cmap = 'Greys_r' , xSize = 20, ySize = 40, selecting = None, filtering = None): #To do: add selecting
     '''draws for every country the evolution of its stategy'''
     if rounds ==0:
         rounds = tournament.rounds
@@ -228,7 +238,7 @@ def draw_evo(tournament, rounds =0 , cmap = 'jet' , xSize = 20, ySize = 40, sele
     # create a patch (proxy artist) for every color
     patches = [ mpatches.Patch(color=colors[i], label=tournament.strategyList[i]) for i in range(len(tournament.strategyList)) ]
     # put those patched as legend-handles into the legend
-    plt.legend(handles=patches, bbox_to_anchor=(0.99,0.99),ncol=1, fontsize='xx-large')
+    plt.legend(handles=patches, bbox_to_anchor=(0.99,0.99),ncol=1, fontsize=24)
 
     ax.set_title("Evolution of each Country's Strategy", fontsize='xx-large')
     #fig.tight_layout()

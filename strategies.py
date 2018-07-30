@@ -1,11 +1,8 @@
 from enum import Enum
 from .action import *
 
-
-
-
 class Strat(Enum):
-    Collaborate = 0
+    Cooperate = 0
     Defect = 1
     TitForTat = 2
     Grudge =3
@@ -16,17 +13,17 @@ class Strat(Enum):
     Contrite = 8
 
     def toFunction(self):
-        functioDict = {Collaborate: collaborate, Defect: defect, TitForTat: tit_for_tat, Grudge: grudge, RandomMove: random_move, Alternate: alternate, GenerousTFT: generoustft, WinStayLoseShift: win_stay_lose_shift, Contrite: contrite_titfortat}
+        functioDict = {Cooperate: cooperate, Defect: defect, TitForTat: tit_for_tat, Grudge: grudge, RandomMove: random_move, Alternate: alternate, GenerousTFT: generoustft, WinStayLoseShift: win_stay_lose_shift, Contrite: contrite_titfortat}
         return functioDict[self]
 
     def __str__(self):
         return self.name
 
 C, D = Action.C, Action.D
-Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift,  = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
+Cooperate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift,  = Strat.Cooperate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
 Contrite = Strat.Contrite
 
-DefaultNoise = 0.1
+DefaultNoise = 0
 
 class Strategy:
     def __init__(self, strat_enum, function, country, noise = DefaultNoise):
@@ -55,7 +52,7 @@ class Strategy:
         return self.strate_enum == other.strat_enum
 
 
-def collaborate(selfmoves, othermoves, noise=DefaultNoise):
+def cooperate(selfmoves, othermoves, noise=DefaultNoise):
     '''Only collaborates'''
     return C.stoc(noise)
 

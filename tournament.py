@@ -17,14 +17,14 @@ import matplotlib.patches as mpatches
 
 
 R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
-Collaborate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Collaborate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
+Cooperate, Defect, TitForTat, Grudge, RandomMove, Alternate, GenerousTFT, WinStayLoseShift = Strat.Cooperate, Strat.Defect, Strat.TitForTat,Strat.Grudge, Strat.RandomMove, Strat.Alternate, Strat.GenerousTFT, Strat.WinStayLoseShift
 
-DefaultNoise = 0.1
+DefaultNoise = 0
 
 class Tournament:
     '''Here a tournament between all countries is played, consisting of matches between all countries'''
 
-    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 5000, strategyList = [Collaborate, GenerousTFT, TitForTat, Defect]):
+    def __init__(self, *countries, initialFitnessEqualsM = True, rounds = 5000, strategyList = [Cooperate, GenerousTFT, TitForTat, Defect]):
         self.countries = list(countries)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []
@@ -44,7 +44,7 @@ class Tournament:
 
     def reset_after_tournament(self): #not yet tested
         for country in self.countries:
-            country.reset_after_tournament(collaborate)
+            country.reset_after_tournament(cooperate)
         self.matches = {} #dict is easy but not efficient.. we'll see if performance becomes an issue,
         self.selfMatches = []
         if initialFitnessEqualsM:

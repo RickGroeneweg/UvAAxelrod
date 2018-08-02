@@ -137,9 +137,11 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
             draw_country_line_delta(country, cmap, tournament.strategyList)
             plt.annotate(country.name, xy=(len(country.fitnessHistory) - 0.5, (country.fitnessHistory[-1] - country.fitnessHistory[-2])))
     elif wholePopulation == True:
-        plt.plot(wholePopulation_fitessList(countries, delta = delta))
-
-
+        plt.plot(wholePopulation_fitessList(countries, delta = delta),c='black',linewidth=1)
+        plt.title("Change in Fitness of Whole Population", fontsize = 24)
+        plt.xlabel("Number of Rounds", fontsize = 24)
+        plt.ylabel("Fitness Level", fontsize = 24)
+        plt.tick_params(axis='both',labelsize=14)
 
 
 
@@ -147,9 +149,9 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
     if delta == False:
         plt.ylabel('Fitness', fontsize='xx-large')
     else:
-        plt.ylabel('FitnessDelta', fontsize = 'xx-large')
-    plt.xlabel('Rounds', fontsize='xx-large')
-    plt.title('Evolution of Fitness in Heterogenous Populations', fontsize='xx-large')
+        plt.xlabel("Number of Rounds", fontsize = 24)
+        plt.ylabel("Change in Fitness", fontsize = 24)
+        plt.tick_params(axis='both',labelsize=14)
 
 def draw_wholePopulation_line_depricated(countries, xSize = 20, ySize = 10):
 

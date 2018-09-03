@@ -175,7 +175,8 @@ yemen,zambia,zimbabwe]
 
 G2 = [unitedstates, china]
 G8 = [canada, france, germany, italy, japan, russia, unitedkingdom, unitedstates]
-EuropeanUnion = [netherlands, belgium, germany, sweden, denmark, finland, poland, czechia, slovakia, italy, portugal, spain, greece, austria, hungary, slovenia, croatia, bulgaria, estonia, latvia, lithuania, ireland, unitedkingdom, romania, luxembourg, malta ]
+EuropeanUnion = [netherlands, belgium, germany, sweden, denmark, finland, poland, czechia, slovakia, italy, portugal, spain, greece, austria, hungary, slovenia, croatia, bulgaria, estonia, latvia, lithuania, ireland, unitedkingdom, romania, luxembourg, malta, france, cyprus ]
+
 
 AllCountriesEU = AllCountriesExeptEU + [eu]
 

@@ -1,39 +1,60 @@
-from .action import *
-from .strategies import Strategy
 
-R,T,S,P = Outcome.R, Outcome.T, Outcome.S, Outcome.P
 
 class Country:
-    '''All features of countries are stored here'''
-
-    def __init__(self, name, m, loc, e, i, area):
+    """
+    stores country hypterparamters, but also state from the simulation
+    """
+    
+    def __init__(self, name, m, location, e, i, area): 
+        
+        # Variables that stay the same during simulations
         self.name = name
         self.m = m
-        self.loc = loc
         self.e = e
         self.i = i
-        self.fitness = 0
-        self.fitnessHistory = [0]
-        self.history = []
-        self.strategy = None
+        self.location = location
         self.area = area
-        self.outcomeDict = {R: 0, T: 0, S: 0, P: 0}
-        self.evolution = []
-
+        self.self_reward = None
+        
+        # State variables, not yet initialized since that will be done in the tournament
+        self.fitness = None 
+        self.fitness_history = []
+    
+        # private attributes, they should only be changed with `change_strategy`
+        self._strategy = None 
+        self._evolution = [] 
+        
+      
     def __str__(self):
-        return self.name
+        return f'<{self.name}>'
+        
     def __repr__(self):
-        return self.name
+        return f'<{self.name}>'
+    
 
-    def init_strategy(self, strat_enum, noise = 0.0):
-        function = strat_enum.toFunction()
-        self.strategy = Strategy(strat_enum, function, self)
-        self.evolution = [(0,self.strategy.strat_enum)]
-
-    def reset_after_tournament(self, strategy):
-        self.fitness = 0
-        self.fitnessHistory = [0]
-        self.history = []
-        self.strategy = None #a function (self, opponent, **kwargs) -> [C,D]
-        self.outcomeDict = {R: 0, T: 0, S: 0, P: 0}
-        self.evolution = []
+    
+    def change_strategy(self, round_num, strategy):
+        """
+        parameters:
+            - round_num: int, round number when the change occured
+            - strategy: new strategy that the country adopts
+        
+        side effects:
+            - set self._strategy to the new strategy
+            - appends self.evolution
+        """
+        self._strategy = strategy
+        self._evolution.append((round_num, strategy))
+        
+    def select_action(self, selfmoves, othermoves):
+        return self._strategy(selfmoves, othermoves)
+    
+    def get_current_strategy(self):
+        """
+        returns:
+            - current strategy
+        """
+        return self._strategy
+    
+    def set_self_reward(self, function):
+        def.self_reward = function(self, self.area)

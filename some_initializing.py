@@ -1,8 +1,7 @@
-from .country import *
-from .city_coordinates import *
-from .strategies import *
-from .match import *
-from .tournament import *
+from country import *
+from city_coordinates import *
+
+
 
 
 albania = Country("Albania",11.927,Tirana,0.46,0.034, 169.56)

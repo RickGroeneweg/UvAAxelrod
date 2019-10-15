@@ -289,6 +289,12 @@ class Tournament:
               other, and get/lose fitness from this
             - nr_strategy_changes: int, number of strategy-changes that occura
               after each round
+              
+        example:
+            >>> tournament = Tournament(XXX)
+            >>> tournament.init_strategies()
+            >>> tournament.play(XXX)
+            XXXXXXX
         """
         if self.is_done:
             print("WARNING: you are playing a tournament that has already been played. This will accumulate more"\

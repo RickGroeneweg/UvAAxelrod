@@ -1,7 +1,29 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from .enums import Action, C, D
 
+def C_D_dict_per_round(tournament):
+    array_dict= {C: np.zeros((tournament.rounds,)), D: np.zeros((tournament.rounds,))}
+    
+    
+    for country_1, country_2, data in tournament.graph.edges(data=True):
+        for round_num, (action_1, action_2) in enumerate(data['history']):
+            array_dict[action_1][round_num] += 1
+            array_dict[action_2][round_num] += 1
+    
+    return array_dict
 
+def overal_C_and_D(tournament):
+    """
+    returns:
+        - tuple where the [0]th resp. [1]th element is the number of times any country cooperated resp. defected.
+    """
+    array_dict = C_D_dict_per_round(tournament)
+    number_of_C = sum(array_dict[C])
+    number_of_D = sum(array_dict[D])
+    
+    return number_of_C, number_of_D
+            
 
 def draw_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
     

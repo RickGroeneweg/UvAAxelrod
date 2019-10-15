@@ -348,11 +348,11 @@ class Tournament:
             country.set_self_reward(function)
             
     @classmethod
-    def create_initialize_and_play_tournament(cls, 
+    def create_play_tournament(cls, 
                  countries, 
                  max_rounds, 
                  strategy_list, 
-                 payoff_functions=default_payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
+                 payoff_functions=default_payoff_functions, 
                  distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
                  surveillance_penalty = True,
                  playing_themselves=True,
@@ -364,6 +364,19 @@ class Tournament:
         """
         Create a tournament, initialize al the variables of the countries and
         then play the tournament.
+        
+        parameters:
+            - countries: list, countries that take part in the tournament
+            - max_rounds: int, maximum number of rounds, after which the tournament will stop
+            - strategy_list: list, strategies that are played in the tournament
+            - payoff_functions: functions to compute the changes in fitness, e.g. `default_payoff_functions` or `traditional_payoff_functions`
+            - distance_function: function to rescale the distance. e.g. `lambda d:d` for linear scaleing and `lambda d: math.log(1+d)` for log-scaling
+            - surveillance_penalty: bool, if countries should be penalized for playing certain strategies
+            - playing_themselves: bool, if countries should get reward from their internal market each round
+            - playing_each_other: bool, if countries should play prisoners delemma's with each other, set to false to create a control-group
+            - nr_strategy_changes: int, number of strategy changes after eacht round
+            - mutation_rate: probability that a strategy change is random
+            - init_fitnes_as_m: bool, if countries start with self.fitness==self.m or self.fitness==0
         
         returns:
             the tournament object, with data from the simulation inside the

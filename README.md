@@ -1,30 +1,31 @@
-# UvAAxelrod
+# UvA Axelrod 
+
+## Simulating world traide relations based on the Axelrod tournament
 
 Quick Start Guide
 
-First we import the UvAAxelrod module, as well as numpy and matplotlib
+This package is written in Python, using libraries: NumPy, GeoPy, NetworkX which
+should be installed.
 
+First Create a Jupyter notebook in the directory that also contains the `UvAAxelrod` folder.
+In this notebook we can import the package as follows:
+```
     from UvAAxelrod import *
     import numpy as np
     import matplotlib.pyplot as plt
 
     np.random.seed(265)
+``` 
+
+
+% Unit test not yet runnable
+% Not yet Noise
+% Generous tit for tat not yet implemented
 
 To run an fast tournament:
-`tournament = Tournament.create_initialize_and_play_tournament(G8, 10, [cooperate, defect, tit_for_tat])`
+`tournament = Tournament.create_play_tournament(G8, 10, [cooperate, defect, tit_for_tat])`
 
-We initialize a tournament using the list of all countries including the EU
-    
-    tour = Tournament(*AllCountriesEU, initialFitnessEqualsM = True, rounds = 100, strategyList = [Defect,TitForTat,GenerousTFT,Cooperate])
-
-We set a strategy for each country in the tournament, here we assign them randomly using numpy
-    
-    for country in tour.countries:
-        tour.init_strategy(np.random.choice(tour.strategyList),country)
-
-We play the tournament using the .play method
-    
-    tour.play(turns = 1, changingStrategy = True, mutationRate = 0.1, playingThemselves = True, playingEachOther = True, nrStrategyChanges     = 1, distance_function = sqrt, surveillancePenalty = True)
+The example above uses the G8 list of countries. Other parameters can be given to this method too, you should consult the dock string in the source code for that.
 
 We draw a graph showing the evolution of the strategies
 

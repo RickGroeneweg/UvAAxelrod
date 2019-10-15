@@ -1,4 +1,5 @@
 from .enums import Action
+import numpy as np
 # Defining possible strategyes.
 # A strategy is simpy a function, with a name-attribute added to it.
 penalty_dict = ...
@@ -22,5 +23,13 @@ def tit_for_tat(selfmoves, othermoves):
         return othermoves[-1]
 tit_for_tat.name = 'tit_for_tat'
 
-def generous_tit_for_tat(selfmvoes, othermoves):
-    pass
+def generous_tit_for_tat(selfmoves, othermoves):
+    if selfmoves == []:
+        return C
+    elif othermoves[-1] == C:
+        # other cooperated last time
+        return C
+    else:
+        # last time, oponent did not cooperate
+        return np.random.choice([C, D], p=[0.3, 0.7])
+generous_tit_for_tat.name = 'generous_tit_for_tat'

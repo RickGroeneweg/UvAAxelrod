@@ -2,14 +2,14 @@ import networkx as nx
 import numpy as np
 from geopy.distance import distance
 
-from country import Country
-from strategies import cooperate, defect, tit_for_tat
-from initialization import *
+
+from .strategies import cooperate, defect, tit_for_tat
+from .some_initializing import *
 
 from itertools import combinations
-from payoff_functions import default_payoff_functions, traditional_payoff_functions, selfreward
+from .payoff_functions import default_payoff_functions, traditional_payoff_functions, selfreward
 
-from enums import to_outcome, Action
+from .enums import to_outcome, Action
 
 class Tournament:
     """
@@ -343,14 +343,45 @@ class Tournament:
                 return False
         return True
     
-    def init_selfreward(function):
+    def init_self_rewards(self, function):
         for country in self.countries():
             country.set_self_reward(function)
+            
+    @classmethod
+    def create_initialize_and_play_tournament(cls, 
+                 countries, 
+                 max_rounds, 
+                 strategy_list, 
+                 payoff_functions=default_payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
+                 distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
+                 surveillance_penalty = True,
+                 playing_themselves=True,
+                 playing_each_other=True,
+                 nr_strategy_changes = 1,
+                 mutation_rate =0.1,
+                 init_fitnes_as_m=True
+                 ):
+        """
+        Create a tournament, initialize al the variables of the countries and
+        then play the tournament.
+        
+        returns:
+            the tournament object, with data from the simulation inside the
+            graph attribute.
+        """
+        tournament = cls(countries, 
+                 max_rounds, 
+                 strategy_list, 
+                 payoff_functions=payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
+                 distance_function = distance_function, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
+                 surveillance_penalty = surveillance_penalty
+                 )
+        tournament.init_strategies()
+        tournament.init_self_rewards(selfreward)
+        tournament.init_fitness(init_fitnes_as_m=init_fitnes_as_m)
+        
+        tournament.play(playing_themselves, playing_each_other, nr_strategy_changes, mutation_rate)
+        
+        return tournament
+        
     
-def default_tournament():
-    tournament = Tournament(G8, 10, [cooperate, tit_for_tat, defect])
-    tournament.init_strategies()
-    tournament.init_self_rewards(selfreward)
-    tournament.init_fitness(init_fitnes_as_m=True)
-
-    return tournament

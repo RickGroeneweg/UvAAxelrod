@@ -1,5 +1,5 @@
-from country import *
-from city_coordinates import *
+from .country import *
+from .city_coordinates import *
 
 
 

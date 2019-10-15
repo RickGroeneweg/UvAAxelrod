@@ -1,4 +1,4 @@
-from enums import Action
+from .enums import Action
 # Defining possible strategyes.
 # A strategy is simpy a function, with a name-attribute added to it.
 penalty_dict = ...

@@ -57,4 +57,4 @@ class Country:
         return self._strategy
     
     def set_self_reward(self, function):
-        def.self_reward = function(self, self.area)
+        self.self_reward = function(self, self.area)

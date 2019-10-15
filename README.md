@@ -10,6 +10,9 @@ First we import the UvAAxelrod module, as well as numpy and matplotlib
 
     np.random.seed(265)
 
+To run an fast tournament:
+`tournament = Tournament.create_initialize_and_play_tournament(G8, 10, [cooperate, defect, tit_for_tat])`
+
 We initialize a tournament using the list of all countries including the EU
     
     tour = Tournament(*AllCountriesEU, initialFitnessEqualsM = True, rounds = 100, strategyList = [Defect,TitForTat,GenerousTFT,Cooperate])

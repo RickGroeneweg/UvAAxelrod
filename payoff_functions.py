@@ -5,9 +5,9 @@
 # the default payoff functions, but in the Tournament instance you
 # could specify to use other functions.
 
-def selfreward(country, d):
+def selfreward(country):
     '''calculates how much reward a country gets from its own internal market'''
-    return country.m/d
+    return country.m/country.area # let SEBASTIAN check this
 
 def reward(country, other, d):
     '''calculates how much reward would change fitness'''

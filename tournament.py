@@ -3,13 +3,13 @@ import numpy as np
 from geopy.distance import distance
 
 
-from .strategies import cooperate, defect, tit_for_tat
+from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat
 from .some_initializing import *
 
 from itertools import combinations
 from .payoff_functions import default_payoff_functions, traditional_payoff_functions, selfreward
 
-from .enums import to_outcome, Action
+from .enums import to_outcome, Action, random_action
 
 class Tournament:
     """
@@ -18,14 +18,17 @@ class Tournament:
     the central class of this package. More can be read in the README.md file
     and in the paper (todo: add link).
     """
-    
-    def __init__(self, countries, 
-                 max_rounds, 
-                 strategy_list, 
-                 payoff_functions=default_payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
-                 distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
-                 surveillance_penalty = True
-                 ):
+    def __init__(
+        self, 
+        countries, 
+        max_rounds, 
+        strategy_list, 
+        payoff_functions=default_payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
+        distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
+        surveillance_penalty = True,
+        penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95, generous_tit_for_tat: 0.90}, # Ask sebastian value for generous-tit-for-tat
+        noise = 0
+    ):
         """
         parameters:
             - countries: Country
@@ -38,7 +41,8 @@ class Tournament:
         self.strategy_list: list = strategy_list
         self.payoff_functions: dict = payoff_functions
         self.surveillance_penalty = surveillance_penalty
-        self.penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95}
+        self.penalty_dict = penalty_dict
+        self.noise = noise
         
         # Data from the simulations will be stored in an NetworkX-graph
         self.graph = self.init_graph(countries, distance_function)
@@ -87,16 +91,16 @@ class Tournament:
                   self.payoff_functions['T'](c2,c1,d))
             # initialize all edges
             graph.add_edge(
-                    c1, 
-                    c2,
-                    # we add data to each edge
-                    history = [], # list to accumulate tuples of actions
-                    distance = d,
-                    RR = RR, 
-                    PP = PP,
-                    TS = TS,
-                    ST = ST
-                    )
+                c1, 
+                c2,
+                # we add data to each edge
+                history = [], # list to accumulate tuples of actions
+                distance = d,
+                RR = RR, 
+                PP = PP,
+                TS = TS,
+                ST = ST
+            )
         
         return graph
     
@@ -113,11 +117,10 @@ class Tournament:
         """
         initizalize strategy for given countries. 
         
-        If no strategy is given, then for each country, 
-        a random strategy is selected form `self.strategy_list`
-        
-        If no countries are given, then this will be done for all countries
-        in `self.countries`
+        parameters:
+            countries: list or None, countries to change strategy, if None, then all countries are used
+            strategy: list or None, stratey to be given to countries, if None, then echt country
+                      is randomly assigned a strategy from self.strategy_list.
         
         side effects:
             - changes the countries strategy
@@ -191,6 +194,7 @@ class Tournament:
             
         side effect:
             - changes a countries strategy
+            
         """
         
         country_list = list(self.countries())
@@ -199,6 +203,7 @@ class Tournament:
         # randomly select a country that will lose it's strategy to the winning strategy
         elimiation_idx = np.random.randint(N)
         losing_country = country_list[elimiation_idx]
+        losing_strategy = losing_country.get_current_strategy()
         
         # select a winning strategy
         mutation = bool(np.random.binomial(1, mutation_rate))
@@ -206,6 +211,7 @@ class Tournament:
             # in stead of changing a strategy according to the rules of the simmulation
             # we sometimes have a random mutation
             winning_strategy = np.random.choice(self.strategy_list)
+            winning_country = 'random_mutation'
         else:
             # we select a winning strategy with the probabilites of 'how much fitness each strategy has'
             fitness_scores = [country.fitness for country in country_list if country.fitness>0]
@@ -219,35 +225,37 @@ class Tournament:
         
         # actually CHANGE the strategy
         losing_country.change_strategy(round_num, winning_strategy)
+        print(f'strategy change: {losing_country} {losing_strategy.name} -> {winning_strategy.name} ({winning_country})')
         
         # for logging
-        return losing_country, winning_strategy #todo do something with this
+        return losing_country, winning_strategy 
     
     def play_prisoners_dilema(self, country_1, country_2, game):
         """
         parameters:
             - coutry_1, country_2: Country
-            - data: 
+            - game: dict, data associated with the game between countr_1 and country_2 
             
         side effects:
             - appends history of game
             - changes fitness of country_1 and country_2
             
         example:
-            >>> tournamnet = Tournament(XXX)
-            >>> 
+            >>> country_1, country_2, data = self.graph.get_edge(india, japan)
+            >>> self.play_prisoners_dilema(country_1, country_2, data)
+            XXX check this example
         """
         
         # get the connection between country 1 and contry 2, call it game
-        #game = self.graph.get_edge_data(country_1, country_2)
+        # game = self.graph.get_edge_data(country_1, country_2)
         if game['history'] == []:
             history_c1, history_c2 = [], []
         else:
             history_c1, history_c2 = list(zip(*game['history']))
         
         # let countries' strategies choose an action
-        action_1 = country_1.select_action(history_c1, history_c2)
-        action_2 = country_2.select_action(history_c2, history_c1)
+        action_1 = country_1.select_action(history_c1, history_c2, self.noise)
+        action_2 = country_2.select_action(history_c2, history_c1, self.noise)
         
         # append game history
         game['history'].append((action_1, action_2))
@@ -276,15 +284,21 @@ class Tournament:
             >>> tournament = Tournament(XXX)
             >>> tournament.check_all_strategies_initialized()
             False
+            >>> tournament.init_strategies()
+            >>> tournament.check_all_strategies_initialized()
+            True
         """
         for country in self.countries():
             if country.get_current_strategy() is None:
                 print(f'WARNING: {country} has no initizalized strategy')
         
-    def play(self, playing_themselves, playing_each_other, nr_strategy_changes, mutation_rate):
+    def play(self, self_reward, playing_each_other, nr_strategy_changes, mutation_rate):
         """
         parameters:
-            - playing_themselves: bool, if countries get fitness from their internal market
+            - self_reward: function or None, None indicates countries do not get 
+                           reward from their internal market, if they do, self_reward
+                           should be the function of the country that gives them 
+                           self_reward.
             - playing_each_other: bool, if countries play prisoners-dilema's with each
               other, and get/lose fitness from this
             - nr_strategy_changes: int, number of strategy-changes that occura
@@ -312,10 +326,10 @@ class Tournament:
             
             self.round += 1
             
-            if playing_themselves:
+            if self_reward:
                 # countries get fitness from their own internal market
                 for country in self.countries():
-                    country.fitness += country.self_reward
+                    country.fitness += self_reward(country)
             
             if playing_each_other:
                 # this can be switched to False to create a control-simulation for comparison
@@ -327,31 +341,29 @@ class Tournament:
             for _ in range(nr_strategy_changes):
                 # change {nr_strategy_changes} strategies
                 losing_country, winning_strategy = self.change_a_strategy(mutation_rate, self.round)
-                print(f'losing: {losing_country}, winning: {winning_strategy}')
                 
             # update fitness_histories
             for country in self.countries():
                 country.fitness_history.append(country.fitness)
                 
             if self.one_strategy_left():
-                print(f'The process ended in {i+1} rounds\n Winning strategy: {list(self.countries())[0].get_current_strategy().name}' )
+                print(f'The process ended in {i+1} rounds\n Winning strategy: {list(self.countries())[0].get_current_strategy().name}')
                 break
             
         # flag that the tournament has ended
         self.is_done = True
         
             
-
     def check_strategies_initialized(self):
+        """
+        check if all countries have a strategy.
+        """
         for country in self.countries():
             if country.get_current_strategy() not in self.strategy_list:
                 print(f'country {country.name} has strategy {country.get_current_strategy()} which is not in the strategy_list')
                 return False
         return True
-    
-    def init_self_rewards(self, function):
-        for country in self.countries():
-            country.set_self_reward(function)
+
             
     @classmethod
     def create_play_tournament(cls, 
@@ -359,13 +371,14 @@ class Tournament:
                  max_rounds, 
                  strategy_list, 
                  payoff_functions=default_payoff_functions, 
-                 distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
+                 distance_function = lambda d: d, # defaults to just the identity
                  surveillance_penalty = True,
-                 playing_themselves=True,
+                 self_reward = selfreward, #default function
                  playing_each_other=True,
                  nr_strategy_changes = 1,
                  mutation_rate =0.1,
-                 init_fitnes_as_m=True
+                 init_fitnes_as_m=True,
+                 noise = 0
                  ):
         """
         Create a tournament, initialize al the variables of the countries and
@@ -378,7 +391,8 @@ class Tournament:
             - payoff_functions: functions to compute the changes in fitness, e.g. `default_payoff_functions` or `traditional_payoff_functions`
             - distance_function: function to rescale the distance. e.g. `lambda d:d` for linear scaleing and `lambda d: math.log(1+d)` for log-scaling
             - surveillance_penalty: bool, if countries should be penalized for playing certain strategies
-            - playing_themselves: bool, if countries should get reward from their internal market each round
+            - self_reward: function or None, a function if countries should get reward from their internal market each round, 
+                           otherwize, if countries should not get reward from their internal market, None
             - playing_each_other: bool, if countries should play prisoners delemma's with each other, set to false to create a control-group
             - nr_strategy_changes: int, number of strategy changes after eacht round
             - mutation_rate: probability that a strategy change is random
@@ -387,19 +401,25 @@ class Tournament:
         returns:
             the tournament object, with data from the simulation inside the
             graph attribute.
+            
+        example: 
+            >>> tournament = Tournament.create_play_tournament(G50, 100, [cooperate, defect, tit_for_tat])
+            ..... <code printed during the simulation>
+            >>> tournament  # now this Tournament can be used for plotting and analytics
+            <UvAAxelrod.tournament.Tournament at 0x7f115d97fcf8>
         """
         tournament = cls(countries, 
                  max_rounds, 
                  strategy_list, 
                  payoff_functions=payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
                  distance_function = distance_function, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
-                 surveillance_penalty = surveillance_penalty
+                 surveillance_penalty = surveillance_penalty,
+                 noise=noise
                  )
         tournament.init_strategies()
-        tournament.init_self_rewards(selfreward)
         tournament.init_fitness(init_fitnes_as_m=init_fitnes_as_m)
         
-        tournament.play(playing_themselves, playing_each_other, nr_strategy_changes, mutation_rate)
+        tournament.play(self_reward, playing_each_other, nr_strategy_changes, mutation_rate)
         
         return tournament
         

@@ -1,4 +1,5 @@
-
+from .enums import random_action
+import numpy as np
 
 class Country:
     """
@@ -46,8 +47,14 @@ class Country:
         self._strategy = strategy
         self._evolution.append((round_num, strategy))
         
-    def select_action(self, selfmoves, othermoves):
-        return self._strategy(selfmoves, othermoves)
+    def select_action(self, selfmoves, othermoves, noise_threshold):
+        r = np.random.uniform()
+        if r < noise_threshold:
+            # there is a chance of {noise_threshold} that this action will 
+            # be randomly selected
+            return random_action()
+        else:
+            return self._strategy(selfmoves, othermoves)
     
     def get_current_strategy(self):
         """

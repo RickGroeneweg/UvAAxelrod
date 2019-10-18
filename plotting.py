@@ -1,9 +1,44 @@
+"""
+This file contains functions, that plot and aggregate results from a simulation
+from the Tournament class.
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 from .enums import Action, C, D
 
+def get_game_history(tournament, c1, c2):
+    """
+    get the history of a game betweet c1 and c2
+    
+    parameters:
+        -c1, c2: Country, countries in question
+        
+    returns:
+        - list of tupples, where the [0]th elements are moves by c1, and the [1]th elements are moves by c2
+        
+    example:
+        >>> get_game_history(tournament, russia, china)
+        [(<Action.C: 1>, <Action.C: 1>),
+         (<Action.C: 1>, <Action.D: 0>),
+         (<Action.D: 0>, <Action.D: 0>)]
+    """
+    data = tournament.graph.get_edge_data(c1, c2)
+    if data is None:
+        # order of c1 and c2 what wrong in the digraph
+        data = tournament.graph.get_edge_data(c2, c1)
+        return [(a1, a2) for (a2, a1) in data['history']]
+    else:
+        return data['history']
+
 def C_D_dict_per_round(tournament):
-    array_dict= {C: np.zeros((tournament.rounds,)), D: np.zeros((tournament.rounds,))}
+    """
+    retuns:
+        - dict, with two keys"
+            - Action.C: array with the number of cooperations per round
+            - Action.D: array with the number of deffections per round
+    """
+    array_dict= {C: np.zeros((tournament.round,)), D: np.zeros((tournament.round,))}
     
     
     for country_1, country_2, data in tournament.graph.edges(data=True):
@@ -22,12 +57,29 @@ def overal_C_and_D(tournament):
     number_of_C = sum(array_dict[C])
     number_of_D = sum(array_dict[D])
     
+    print(f'number of cooperations: {number_of_C}, number of deffections: {number_of_D}')
+    
     return number_of_C, number_of_D
             
 
+def draw_C_and_D_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
+    rounds = rounds or tournament.round
+    
+    c_d_dict = C_D_dict_per_round(tournament)
+    matrix = np.stack([c_d_dict[Action.C], c_d_dict[Action.D]])
+
+    fig, ax = plt.subplots(figsize =(width, length))
+    ax.stackplot(range(rounds), *matrix, colors=[(1,1,1), (0,0,0)]) #this needs to be adjusted for the number of strategies
+    ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
+    plt.ylabel('Moves', fontsize=24)
+    print('Ask sebastian if he wants this per market share in stead of moves')
+    plt.xlabel('Round number', fontsize=24)
+    plt.tick_params(axis='both',labelsize=14)
+    plt.title('Defection(Black) and Cooperation(White)', fontsize=24)
+
 def draw_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
     
-    rounds = rounds or tournament.rounds
+    rounds = rounds or tournament.round
     n_strategies = len(tournament.strategy_list)
     matrix = np.zeros((n_strategies, rounds+1))
     
@@ -46,7 +98,7 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
         matrix[row, last_evo:] += country.m
     
     fig, ax = plt.subplots(figsize =(width, length))
-    ax.stackplot(range(rounds+1), *matrix, labels=tournament.strategy_list, colors= colors) #this needs to be adjusted for the number of strategies
+    ax.stackplot(range(rounds+1), *matrix, labels=[s.name for s in tournament.strategy_list], colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
     plt.ylabel('Market share', fontsize=24)
     plt.xlabel('Round number', fontsize=24)

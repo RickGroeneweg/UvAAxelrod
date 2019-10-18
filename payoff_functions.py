@@ -35,8 +35,8 @@ default_payoff_functions = {
 # Ask Sebastian: can he confirm that these are the right values?
 # in the traditional Axelrod tournament, payoffs are fixed for all participants
 traditional_payoff_functions = {
-        'R': lambda *args: 2,
-        'T': lambda *args: 3,
+        'R': lambda *args: 3,
+        'T': lambda *args: 5,
         'S': lambda *args: 0,
         'P': lambda *args: 1
         }

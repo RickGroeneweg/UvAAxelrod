@@ -7,6 +7,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from .enums import Action, C, D
 
+def template_for_sebastian(tournament):
+    """
+    Discription
+    
+    example:
+        >>>
+    """
+    pass
+
+
+
+
+
+
 def get_game_history(tournament, c1, c2):
     """
     get the history of a game betweet c1 and c2

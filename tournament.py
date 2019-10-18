@@ -216,7 +216,7 @@ class Tournament:
             # we select a winning strategy with the probabilites of 'how much fitness each strategy has'
             fitness_scores = [country.fitness for country in country_list if country.fitness>0]
             total_fitness = sum(fitness_scores)
-            probabilities = [fitness_scores[j]/total_fitness for j in range(N)]
+            probabilities = [fitness_scores[j]/total_fitness for j in range(N)] # errors if total fitness becomes negative...
             
             # select a random country, with probabilities by normalized fitnesses
             reproduce_idx = np.random.choice(range(N), p=probabilities)

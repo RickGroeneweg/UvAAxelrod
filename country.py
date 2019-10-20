@@ -6,7 +6,7 @@ class Country:
     stores country hypterparamters, but also state from the simulation
     """
     
-    def __init__(self, name, m, location, e, i, area): 
+    def __init__(self, name, m, location, e, i, sqrt_area): 
         
         # Variables that stay the same during simulations
         self.name = name
@@ -14,7 +14,7 @@ class Country:
         self.e = e
         self.i = i
         self.location = location
-        self.area = area
+        self.sqrt_area = sqrt_area
         self.self_reward = None
         
         # State variables, not yet initialized since that will be done in the tournament
@@ -62,6 +62,3 @@ class Country:
             - current strategy
         """
         return self._strategy
-    
-    def set_self_reward(self, function):
-        self.self_reward = function(self, self.area)

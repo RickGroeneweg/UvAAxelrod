@@ -4,7 +4,7 @@ from geopy.distance import distance
 
 
 from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat
-from .some_initializing import *
+from .initialize_countries import *
 
 from itertools import combinations
 from .payoff_functions import default_payoff_functions, traditional_payoff_functions, selfreward
@@ -26,7 +26,7 @@ class Tournament:
         payoff_functions=default_payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
         distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
         surveillance_penalty = True,
-        penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95, generous_tit_for_tat: 0.90}, # Ask sebastian value for generous-tit-for-tat
+        penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95, generous_tit_for_tat: 0.95}, # Ask sebastian value for generous-tit-for-tat
         noise = 0
     ):
         """
@@ -113,6 +113,8 @@ class Tournament:
         """
         return self.graph.nodes()
     
+    
+    # Todo: this now gives an assertion error
     def init_strategies(self, countries = None, strategy = None):
         """
         initizalize strategy for given countries. 
@@ -129,7 +131,10 @@ class Tournament:
             >>> tournament = Tournament(...)
             >>> tournament.init_strategies(china, cooperate)
         """
-        assert self.round == 0
+        assert self.round == 0, f'The round number of this tournament should be 0 when strategies are initialized, but it is {self.round}'
+        
+        if isinstance(countries, Country):
+            countries = [countries]
         
         countries = countries or self.countries()
         
@@ -365,11 +370,12 @@ class Tournament:
         return True
 
             
+    #Todo: remove initial fitness
     @classmethod
     def create_play_tournament(cls, 
                  countries, 
                  max_rounds, 
-                 strategy_list, 
+                 strategy_list=[defect, cooperate], 
                  payoff_functions=default_payoff_functions, 
                  distance_function = lambda d: d, # defaults to just the identity
                  surveillance_penalty = True,
@@ -377,7 +383,7 @@ class Tournament:
                  playing_each_other=True,
                  nr_strategy_changes = 1,
                  mutation_rate =0.1,
-                 init_fitnes_as_m=True,
+                 init_fitnes_as_m=False,
                  noise = 0
                  ):
         """

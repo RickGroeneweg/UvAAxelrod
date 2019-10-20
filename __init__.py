@@ -5,6 +5,6 @@ from .strategies import *
 from .country import *
 
 
-from .city_coordinates import *
+from .initialize_countries import *
 from .tournament import *
 from .plotting import *

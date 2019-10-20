@@ -21,6 +21,7 @@ def template_for_sebastian(tournament):
 
 
 
+
 def get_game_history(tournament, c1, c2):
     """
     get the history of a game betweet c1 and c2
@@ -44,6 +45,20 @@ def get_game_history(tournament, c1, c2):
         return [(a1, a2) for (a2, a1) in data['history']]
     else:
         return data['history']
+    
+def outcomes_dict_per_round(tournament):
+    array_dict= {'Mutual_Cooperation': np.zeros((tournament.round,)), 'Mutual_Defection': np.zeros((tournament.round,)), 'Exploitation': np.zeros((tournament.round,))}
+
+    for country_1, country_2, data in tournament.graph.edges(data=True):
+        for round_num, (action_1, action_2) in enumerate(data['history']):
+            if action_1 == action_2:
+                outcome = 'Mutual_Cooperation' if action_1 == C else 'Mutual_Defection'
+                array_dict[outcome][round_num] += 1
+            else:
+                array_dict['Exploitation'][round_num] += 1
+
+    return array_dict
+
 
 def C_D_dict_per_round(tournament):
     """
@@ -62,6 +77,14 @@ def C_D_dict_per_round(tournament):
     
     return array_dict
 
+def overal_outcomes(tournament):
+    array_dict = outcomes_dict_per_round(tournament)
+    number_mutual_C = sum(array_dict['Mutual_Cooperation'])
+    number_mutual_D = sum(array_dict['Mutual_Defection'])
+    number_exploitation = sum(array_dict['Exploitation'])
+    
+    return number_mutual_C, number_mutual_D, number_exploitation
+
 def overal_C_and_D(tournament):
     """
     returns:
@@ -75,21 +98,26 @@ def overal_C_and_D(tournament):
     
     return number_of_C, number_of_D
             
-
-def draw_C_and_D_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
-    rounds = rounds or tournament.round
+def outcome_ratios_per_round(tournament):
+    array_dict = outcomes_dict_per_round(tournament)
+    fractions_mutual_C = [num_c/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
+    fractions_mutual_D = [num_d/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
+    fractions_mutual_Expl = [num_expl/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     
-    c_d_dict = C_D_dict_per_round(tournament)
-    matrix = np.stack([c_d_dict[Action.C], c_d_dict[Action.D]])
+    plt.plot(fractions_mutual_C, label='Mutual Cooperation')
+    plt.plot(fractions_mutual_D, label='Mutual Defection')
+    plt.plot(fractions_mutual_Expl, label='Exploitation')
+    plt.legend()
+    plt.xlabel('Round number')
+    plt.ylabel('Outcome ratios')
 
-    fig, ax = plt.subplots(figsize =(width, length))
-    ax.stackplot(range(rounds), *matrix, colors=[(1,1,1), (0,0,0)]) #this needs to be adjusted for the number of strategies
-    ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
-    plt.ylabel('Moves', fontsize=24)
-    print('Ask sebastian if he wants this per market share in stead of moves')
-    plt.xlabel('Round number', fontsize=24)
-    plt.tick_params(axis='both',labelsize=14)
-    plt.title('Defection(Black) and Cooperation(White)', fontsize=24)
+def C_D_ratios_per_round(tournament):
+    array_dict = C_D_dict_per_round(tournament)
+    fractions_c = [num_c/(num_c + num_d) for num_c, num_d in zip(array_dict[C], array_dict[D])]
+
+    plt.plot(fractions_c)
+    plt.xlabel('Round number')
+    plt.ylabel('Cooperation ratio')
 
 def draw_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
     

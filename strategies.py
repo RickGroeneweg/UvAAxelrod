@@ -2,7 +2,6 @@ from .enums import Action
 import numpy as np
 # Defining possible strategyes.
 # A strategy is simpy a function, with a name-attribute added to it.
-penalty_dict = ...
 
 C, D = Action.C, Action.D
 

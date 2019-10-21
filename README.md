@@ -80,3 +80,11 @@ outcome_ratios_per_round(tournament_2017)
 ```
 draw_stack(tournament_2017)
 ```
+
+```
+mean_C(tournament_2017)
+```
+
+```
+standard_deviation_C(tournament_2017)
+```

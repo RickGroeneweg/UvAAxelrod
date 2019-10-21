@@ -38,6 +38,16 @@ def get_game_history(tournament, c1, c2):
          (<Action.C: 1>, <Action.D: 0>),
          (<Action.D: 0>, <Action.D: 0>)]
     """
+    # quick fix to be able to get the right countries by using their names as strings
+    if isinstance(c1, str):
+        c1 = [c for c in tournament.countries() if c.name==c1][0]
+    if isinstance(c2, str):
+        c2 = [c for c in tournament.countries() if c.name==c2][0]
+        
+    # Todo: if the name of a country is not in the list of names, then the code above error without clear message
+    
+    
+    
     data = tournament.graph.get_edge_data(c1, c2)
     if data is None:
         # order of c1 and c2 what wrong in the digraph
@@ -76,6 +86,21 @@ def C_D_dict_per_round(tournament):
             array_dict[action_2][round_num] += 1
     
     return array_dict
+
+def mean_C(tournament):
+    n_C, n_D = overal_C_and_D(tournament)
+    result = n_C/(n_C+n_D)
+    print(f'the mean level of Cooperation: {result}')
+    return result
+
+def standard_deviation_C(tournament):
+    array_dict = C_D_dict_per_round(tournament)
+    fractions_c = [num_c/(num_c + num_d) for num_c, num_d in zip(array_dict[C], array_dict[D])]
+    result = np.std(fractions_c)
+    print(f'the standard deviation of the series of standardized cooperation levels per round: {result}')
+    
+    return result
+    
 
 def overal_outcomes(tournament):
     array_dict = outcomes_dict_per_round(tournament)
@@ -216,7 +241,7 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
             draw_country_line_delta(country, cmap, tournament.strategy_list)
             plt.annotate(country.name, xy=(len(country.fitness_history) - 0.5, (country.fitness_history[-1] - country.fitness_history[-2])))
     elif wholePopulation == True:
-        plt.plot(wholePopulation_fitessList(countries, delta = delta),c='black',linewidth=1)
+        plt.plot(wholePopulation_fitnessList(countries, delta = delta),c='black',linewidth=1)
         plt.title("Change in Fitness of Whole Population", fontsize = 24)
         plt.xlabel("Number of Rounds", fontsize = 24)
         plt.ylabel("Fitness Level", fontsize = 24)

@@ -27,7 +27,7 @@ def get_game_history(tournament, c1, c2):
     get the history of a game betweet c1 and c2
     
     parameters:
-        -c1, c2: Country, countries in question
+        - c1, c2: Country, countries in question
         
     returns:
         - list of tupples, where the [0]th elements are moves by c1, and the [1]th elements are moves by c2
@@ -177,8 +177,8 @@ def draw_country_line_delta(country, cmap, strategy_list):
     for i in range(len(fitness_history)-1):
         fitnessDeltas.append(fitness_history[i+1] - fitness_history[i])
     plt.plot(fitnessDeltas)
- 
-def wholePopulation_fitessList(countries, delta = False):
+
+def wholePopulation_fitnessList(countries, delta = False):
     def calculate_entire_fitness(roundNumber): #Give entire fitness in the population at roundNumber
         result = 0
         for country in countries:

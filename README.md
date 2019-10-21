@@ -1,6 +1,6 @@
 # UvA Axelrod 
 
-## Simulating world traide relations based on the Axelrod tournament
+## Simulating world trade relations based on the Axelrod tournament
 
 Quick Start Guide
 
@@ -49,7 +49,7 @@ from UvAAxelrod import *
 
 ```
 # important to have the .csv files in the directory of this notebook
-WTO_2017 = get_WTO_countries(2013)
+WTO_2017 = get_WTO_countries(2017)
 ```
 ```
 tournament_2017 = Tournament.create_play_tournament(

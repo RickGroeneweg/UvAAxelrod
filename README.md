@@ -69,11 +69,11 @@ tournament_2017 = Tournament.create_play_tournament(
 ```
 
 ```
-C_D_ratios_per_round(tournament_2017)
+C_D_ratios_per_round(tournament_2017, x_size= 10, y_size=10)
 ```
 
 ```
-outcome_ratios_per_round(tournament_2017)
+outcome_ratios_per_round(tournament_2017, x_size=10, y_size=10)
 ```
 
 

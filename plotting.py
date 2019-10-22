@@ -18,10 +18,6 @@ def template_for_sebastian(tournament):
 
 
 
-
-
-
-
 def get_game_history(tournament, c1, c2):
     """
     get the history of a game betweet c1 and c2
@@ -52,15 +48,16 @@ def get_game_history(tournament, c1, c2):
     if data is None:
         # order of c1 and c2 what wrong in the digraph
         data = tournament.graph.get_edge_data(c2, c1)
-        return [(a1, a2) for (a2, a1) in data['history']]
+        return zip(data['history_2'],data['history_1'])
     else:
-        return data['history']
+        return zip(data['history_1'],data['history_2'])
     
 def outcomes_dict_per_round(tournament):
     array_dict= {'Mutual_Cooperation': np.zeros((tournament.round,)), 'Mutual_Defection': np.zeros((tournament.round,)), 'Exploitation': np.zeros((tournament.round,))}
 
-    for country_1, country_2, data in tournament.graph.edges(data=True):
-        for round_num, (action_1, action_2) in enumerate(data['history']):
+    for country_1, country_2, data in tournament.graph.edges(data=True):     
+        
+        for round_num, (action_1, action_2) in enumerate(get_game_history(tournament, country_1, country_2)):
             if action_1 == action_2:
                 outcome = 'Mutual_Cooperation' if action_1 == C else 'Mutual_Defection'
                 array_dict[outcome][round_num] += 1
@@ -81,7 +78,7 @@ def C_D_dict_per_round(tournament):
     
     
     for country_1, country_2, data in tournament.graph.edges(data=True):
-        for round_num, (action_1, action_2) in enumerate(data['history']):
+        for round_num, (action_1, action_2) in enumerate(get_game_history(tournament, country_1, country_2)):
             array_dict[action_1][round_num] += 1
             array_dict[action_2][round_num] += 1
     
@@ -123,28 +120,30 @@ def overal_C_and_D(tournament):
     
     return number_of_C, number_of_D
             
-def outcome_ratios_per_round(tournament):
+def outcome_ratios_per_round(tournament, x_size, y_size):
     array_dict = outcomes_dict_per_round(tournament)
     fractions_mutual_C = [num_c/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     fractions_mutual_D = [num_d/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     fractions_mutual_Expl = [num_expl/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     
-    plt.plot(fractions_mutual_C, label='Mutual Cooperation')
-    plt.plot(fractions_mutual_D, label='Mutual Defection')
-    plt.plot(fractions_mutual_Expl, label='Exploitation')
+    fig, ax = plt.subplots(figsize =(x_size, y_size))
+    plt.plot(fractions_mutual_C, label='Mutual Cooperation', color =(0.8,)*3)
+    plt.plot(fractions_mutual_D, label='Mutual Defection', color =(0.2,)*3)
+    plt.plot(fractions_mutual_Expl, label='Exploitation', color =(0.5,)*3)
     plt.legend()
     plt.xlabel('Round number')
     plt.ylabel('Outcome ratios')
 
-def C_D_ratios_per_round(tournament):
+def C_D_ratios_per_round(tournament, x_size, y_size):
     array_dict = C_D_dict_per_round(tournament)
     fractions_c = [num_c/(num_c + num_d) for num_c, num_d in zip(array_dict[C], array_dict[D])]
 
-    plt.plot(fractions_c)
+    fig, ax = plt.subplots(figsize =(x_size, y_size))
+    plt.plot(fractions_c, color='black')
     plt.xlabel('Round number')
     plt.ylabel('Cooperation ratio')
 
-def draw_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
+def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size=10, y_size =23):
     
     rounds = rounds or tournament.round
     n_strategies = len(tournament.strategy_list)
@@ -164,7 +163,7 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', length=10, width =23):
         row = tournament.strategy_list.index(last_strategy)
         matrix[row, last_evo:] += country.m
     
-    fig, ax = plt.subplots(figsize =(width, length))
+    fig, ax = plt.subplots(figsize =(y_size, x_size))
     ax.stackplot(range(rounds+1), *matrix, labels=[s.name for s in tournament.strategy_list], colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
     plt.ylabel('Market share', fontsize=24)
@@ -219,9 +218,9 @@ def wholePopulation_fitnessList(countries, delta = False):
     else:
         return [0] + [(listOfFitnesses[i+1] - listOfFitnesses[i]) for i in range(len(listOfFitnesses)-1)]    
     
-def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r', xSize = 10, ySize = 10, delta = False, wholePopulation = False):
+def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10, delta = False, wholePopulation = False):
 
-    fig, ax = plt.subplots(figsize =(xSize, ySize))
+    fig, ax = plt.subplots(figsize =(x_size, y_size))
     cmap = plt.get_cmap(cmap)
 
     if selecting:

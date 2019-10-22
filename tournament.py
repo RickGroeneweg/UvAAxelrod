@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 from geopy.distance import distance
-
+import time
 
 from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat
 from .initialize_countries import *
@@ -94,7 +94,8 @@ class Tournament:
                 c1, 
                 c2,
                 # we add data to each edge
-                history = [], # list to accumulate tuples of actions
+                history_1 = [], # list to accumulate tuples of actions
+                history_2 = [],
                 distance = d,
                 RR = RR, 
                 PP = PP,
@@ -162,8 +163,25 @@ class Tournament:
             country.fitness = country.m if init_fitnes_as_m else 0
             country.fitness_history = [country.fitness]
         
-    
-    def one_strategy_left(self):
+    def countries_per_strategy_dict(self):
+        """
+        return:
+            - dictionary where the keys are strategies and the values the number of countries that play this strategy
+            
+        example:
+            >>> tournament = Tournament(XXX)
+            >>> tournament.init_strategies(None, cooperate)
+            >>> tournament.countries_per_strategy_dict()
+            {cooperate: 100, defect: 0}
+        """
+        d = {strategy: 0 for strategy in self.strategy_list}
+        for country in self.countries():
+            d[country._strategy] += 1
+        return d
+        
+        
+        
+    def one_strategy_left(self, strategy_n_countries_dict):
         """
         returns:
             - True if there is only one strategy left in the simulation
@@ -174,14 +192,10 @@ class Tournament:
             >>> tournament.one_strategy_left()
             True
         """
-        country_1_strategy = list(self.countries())[0].get_current_strategy().name # uggly and inefficient way to get a strategy
-        for country in self.countries():
-            if country.get_current_strategy().name != country_1_strategy:
-                # quit as soon that we see two different strategies
-                return False
-            
-        # all strategies are equal to country_1_strategy
-        return True
+        for value in strategy_n_countries_dict.values():
+            if value == len(self.countries()):
+                return True
+        return False
 
     
     def change_a_strategy(self, mutation_rate, round_num):
@@ -230,7 +244,7 @@ class Tournament:
         
         # actually CHANGE the strategy
         losing_country.change_strategy(round_num, winning_strategy)
-        print(f'strategy change: {losing_country} {losing_strategy.name} -> {winning_strategy.name} ({winning_country})')
+        print(f'  strategy change: {losing_country} {losing_strategy.name} -> {winning_strategy.name} ({winning_country})')
         
         # for logging
         return losing_country, winning_strategy 
@@ -250,24 +264,19 @@ class Tournament:
             >>> self.play_prisoners_dilema(country_1, country_2, data)
             XXX check this example
         """
-        
-        # get the connection between country 1 and contry 2, call it game
-        # game = self.graph.get_edge_data(country_1, country_2)
-        if game['history'] == []:
-            history_c1, history_c2 = [], []
-        else:
-            history_c1, history_c2 = list(zip(*game['history']))
-        
+                   
+            
         # let countries' strategies choose an action
-        action_1 = country_1.select_action(history_c1, history_c2, self.noise)
-        action_2 = country_2.select_action(history_c2, history_c1, self.noise)
+        action_1 = country_1.select_action(game['history_1'], game['history_2'], self.noise)
+        action_2 = country_2.select_action(game['history_2'], game['history_1'], self.noise)
         
         # append game history
-        game['history'].append((action_1, action_2))
+        game['history_1'].append(action_1)
+        game['history_2'].append(action_2)
         
         # get payoff values
         outcome = to_outcome(action_1, action_2)
-        Δfitness_1,  Δfitness_2 = self.graph.get_edge_data(country_1, country_2)[outcome]
+        Δfitness_1,  Δfitness_2 = game[outcome] #self.graph.get_edge_data(country_1, country_2)[outcome]
         
         if self.surveillance_penalty:
             # to simmulate the effort that it takes to take a certain strategy
@@ -328,8 +337,10 @@ class Tournament:
         #TODO: ad warning for not initializing fitness
         
         for i in range(self.max_rounds):
+            #start_t = time.time()
             
             self.round += 1
+            print(f'=== ROUND {self.round} ===')
             
             if self_reward:
                 # countries get fitness from their own internal market
@@ -351,10 +362,16 @@ class Tournament:
             for country in self.countries():
                 country.fitness_history.append(country.fitness)
                 
-            if self.one_strategy_left():
+            if self.one_strategy_left(self.countries_per_strategy_dict()):
                 print(f'The process ended in {i+1} rounds\n Winning strategy: {list(self.countries())[0].get_current_strategy().name}')
                 break
             
+            #end_t = time.time()
+            #print(f'    time round: {end_t-start_t} seconds')
+            if self.round % 10 == 0:
+                for (s,i) in self.countries_per_strategy_dict().items():
+                    print(f'    {s.name}: {i}')
+
         # flag that the tournament has ended
         self.is_done = True
         

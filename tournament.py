@@ -71,6 +71,7 @@ class Tournament:
         # add nodes to graph
         for country in countries:
             graph.add_node(country)
+            country.d = distance_function(country.sqrt_area)
             
         # add edges to graph
         # loop through all combinations of countries in the tournament.

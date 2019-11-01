@@ -6,6 +6,7 @@ from the Tournament class.
 import matplotlib.pyplot as plt
 import numpy as np
 from .enums import Action, C, D
+import pandas as pd
 
 def template_for_sebastian(tournament):
     """
@@ -17,6 +18,45 @@ def template_for_sebastian(tournament):
     pass
 
 
+def get_country_df(tournament, add_outcomes=True):
+    df = pd.DataFrame([[c.name, c.m, c.e, c.i, c.sqrt_area] for c in list(tournament.graph.nodes)], columns=['name', 'm', 'e', 'i', 'sqrt_area']).set_index('name')
+    if add_outcomes:
+        outcomes = get_outcomes(tournament, df)
+        outcomes_df = pd.DataFrame.from_dict(outcomes, orient='index')
+        df = df.join(outcomes_df)
+        
+    return df
+
+def get_outcomes(tournament, df):
+    acc_dict = {}
+    
+    for country in tournament.graph.nodes:
+        games_1 = list(tournament.graph.out_edges(country, data=True))
+        games_2 = list(tournament.graph.in_edges(country, data=True))
+        
+        #assert len(games_1)+len(games_2) == len(tournament.graph.nodes) -1
+        outcome_dict = {(C,C): 'R', (C,D):'S', (D,C): 'T', (D,D): 'P'}
+        outcome_acc = {'R': 0, 'S': 0, 'T':0, 'P':0}
+        
+        for game in games_1:
+            c1, c2, data = game
+            assert c1 == country
+            zips = list(zip(data['history_1'], data['history_2']))
+            for actions in zips:
+                outcome_acc[outcome_dict[actions]] += 1
+        for game in games_2:
+            c2, c1, data = game
+            assert c1 == country
+            zips = list(zip(data['history_2'], data['history_1']))
+            for actions in zips:
+                outcome_acc[outcome_dict[actions]] += 1 
+                
+        #print(sum(outcome_acc.values()))
+        acc_dict[country.name] = outcome_acc
+    #print(acc_dict)
+    return acc_dict    
+            
+        
 
 def get_game_history(tournament, c1, c2):
     """

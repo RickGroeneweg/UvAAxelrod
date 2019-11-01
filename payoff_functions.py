@@ -7,7 +7,7 @@
 
 def selfreward(country):
     '''calculates how much reward a country gets from its own internal market'''
-    return country.m/country.d # let SEBASTIAN check this
+    return country.m/country.d
 
 def reward(country, other, d):
     '''calculates how much reward would change fitness'''

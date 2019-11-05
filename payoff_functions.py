@@ -29,7 +29,8 @@ default_payoff_functions = {
         'R': reward,
         'T': temptation,
         'S': sucker,
-        'P': punishment
+        'P': punishment,
+        'self_reward': selfreward
         }
 
 # Ask Sebastian: can he confirm that these are the right values?

@@ -45,7 +45,7 @@ class Tournament:
         self.noise = noise
         
         # Data from the simulations will be stored in an NetworkX-graph
-        self.graph = self.init_graph(countries, distance_function)
+        self.graph = self.init_graph(countries, distance_function, self.payoff_functions)
         
         # results of a the simulations
         self.fitness_results = np.zeros((len(self.countries()), max_rounds))
@@ -54,8 +54,9 @@ class Tournament:
         # state variables
         self.round = 0
         self.is_done = False
-        
-    def init_graph(self, countries, distance_function):
+       
+    @staticmethod
+    def init_graph(countries, distance_function, payoff_functions):
         """
         initialize the graph (form the NetworkX library), that is used to store
         data from the simulation. Nodes in this graph store countries, and edges
@@ -82,14 +83,14 @@ class Tournament:
             # R: reward, P: punishment, T: temptation, S: sucker
             real_distance = distance(c1.location, c2.location).km
             d = distance_function(real_distance) if distance_function else real_distance
-            RR = (self.payoff_functions['R'](c1,c2,d), 
-                  self.payoff_functions['R'](c2,c1,d))
-            PP = (self.payoff_functions['R'](c1,c2,d), 
-                  self.payoff_functions['R'](c2,c1,d))
-            TS = (self.payoff_functions['T'](c1,c2,d), 
-                  self.payoff_functions['S'](c2,c1,d))
-            ST = (self.payoff_functions['S'](c1,c2,d), 
-                  self.payoff_functions['T'](c2,c1,d))
+            RR = (payoff_functions['R'](c1,c2,d), 
+                  payoff_functions['R'](c2,c1,d))
+            PP = (payoff_functions['P'](c1,c2,d), 
+                  payoff_functions['P'](c2,c1,d))
+            TS = (payoff_functions['T'](c1,c2,d), 
+                  payoff_functions['S'](c2,c1,d))
+            ST = (payoff_functions['S'](c1,c2,d), 
+                  payoff_functions['T'](c2,c1,d))
             # initialize all edges
             graph.add_edge(
                 c1, 

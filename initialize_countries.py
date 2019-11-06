@@ -43,6 +43,7 @@ def get_WTO_countries(year):
             df['i'].at[name], 
             sqrt_area_dict[name],
         )
+        
         countries.append(country)
         
     return countries

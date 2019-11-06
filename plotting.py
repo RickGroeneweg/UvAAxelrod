@@ -6,6 +6,58 @@ from the Tournament class.
 import matplotlib.pyplot as plt
 import numpy as np
 from .enums import Action, C, D
+import pandas as pd
+from .tournament import Tournament
+from statistics import mean, stdev
+
+
+
+def get_game_data(graph, c1, c2, OUTCOME):
+    outcome ={'R':'RR', 'P':'PP', 'T':'TS', 'S':'ST'}[OUTCOME]
+    
+    data = graph.get_edge_data(c1, c2)
+    if data is None:
+        # order of c1 and c2 what wrong in the digraph
+        data = graph.get_edge_data(c2, c1)
+        
+        # the outcome
+        return data[outcome[::-1]][1]
+    else:
+        return data[outcome][0]
+
+def get_payoff_dataframe(population,  payoff_functions, distance_function, outcome):
+    """
+    parameters:
+        - outcome: one of 'R', 'S', 'P', 'T'
+    """
+    graph = Tournament.init_graph(population, distance_function, payoff_functions)
+    names = [c.name for c in list(graph.nodes)]
+    df = pd.DataFrame([], columns=names)
+    for this_country in population:
+        country_dict = {}
+        for other_country in population:
+            if this_country == other_country: continue
+
+            dat = get_game_data(graph, this_country, other_country, outcome)
+
+            country_dict[other_country.name] = dat
+           
+        
+        
+        country_dict['Receiving_Country'] = this_country.name
+    
+
+        df = df.append(country_dict, ignore_index=True)
+    df = df.set_index('Receiving_Country')
+
+    return df
+
+
+
+
+
+
+
 
 def template_for_sebastian(tournament):
     """
@@ -17,6 +69,45 @@ def template_for_sebastian(tournament):
     pass
 
 
+def get_country_df(tournament, add_outcomes=True):
+    df = pd.DataFrame([[c.name, c.m, c.e, c.i, c.sqrt_area] for c in list(tournament.graph.nodes)], columns=['name', 'm', 'e', 'i', 'sqrt_area']).set_index('name')
+    if add_outcomes:
+        outcomes = get_outcomes(tournament, df)
+        outcomes_df = pd.DataFrame.from_dict(outcomes, orient='index')
+        df = df.join(outcomes_df)
+        
+    return df
+
+def get_outcomes(tournament, df):
+    acc_dict = {}
+    
+    for country in tournament.graph.nodes:
+        games_1 = list(tournament.graph.out_edges(country, data=True))
+        games_2 = list(tournament.graph.in_edges(country, data=True))
+        
+        #assert len(games_1)+len(games_2) == len(tournament.graph.nodes) -1
+        outcome_dict = {(C,C): 'R', (C,D):'S', (D,C): 'T', (D,D): 'P'}
+        outcome_acc = {'R': 0, 'S': 0, 'T':0, 'P':0}
+        
+        for game in games_1:
+            c1, c2, data = game
+            assert c1 == country
+            zips = list(zip(data['history_1'], data['history_2']))
+            for actions in zips:
+                outcome_acc[outcome_dict[actions]] += 1
+        for game in games_2:
+            c2, c1, data = game
+            assert c1 == country
+            zips = list(zip(data['history_2'], data['history_1']))
+            for actions in zips:
+                outcome_acc[outcome_dict[actions]] += 1 
+                
+        #print(sum(outcome_acc.values()))
+        acc_dict[country.name] = outcome_acc
+    #print(acc_dict)
+    return acc_dict    
+            
+        
 
 def get_game_history(tournament, c1, c2):
     """
@@ -72,7 +163,7 @@ def C_D_dict_per_round(tournament):
     retuns:
         - dict, with two keys"
             - Action.C: array with the number of cooperations per round
-            - Action.D: array with the number of deffections per round
+            - Action.D: array with the number of defections per round
     """
     array_dict= {C: np.zeros((tournament.round,)), D: np.zeros((tournament.round,))}
     
@@ -116,7 +207,7 @@ def overal_C_and_D(tournament):
     number_of_C = sum(array_dict[C])
     number_of_D = sum(array_dict[D])
     
-    print(f'number of cooperations: {number_of_C}, number of deffections: {number_of_D}')
+    print(f'number of cooperations: {number_of_C}, number of defections: {number_of_D}')
     
     return number_of_C, number_of_D
             
@@ -246,14 +337,160 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
         plt.ylabel("Fitness Level", fontsize = 24)
         plt.tick_params(axis='both',labelsize=14)
 
+def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10):
+    """
+    population fitness (summed) per round
+    """
+
+    fig, ax = plt.subplots(figsize =(x_size, y_size))
+    cmap = plt.get_cmap(cmap)
+
+    if selecting:
+        countries=selecting
+    elif filtering:
+        countries = [country for country in tournament.countries if not country in filtering]
+    else:
+        countries = list(tournament.countries())
+
+    fitness_histories = [c.fitness_history for c in countries]
+    ls = [sum(fitnesses) for fitnesses in zip(*fitness_histories)]
+
+    plt.plot(ls,c='black',linewidth=1)
+    plt.title("Fitness of Whole Population", fontsize = 24)
+    plt.xlabel("Number of Rounds", fontsize = 24)
+    plt.ylabel("Fitness Level", fontsize = 24)
+    plt.tick_params(axis='both',labelsize=14)   
+
+
+
+
     
     
     
+### definitions by Sebastian
+def get_rewards(population, payoff_functions, distance_function):
+    """
+    calculate the payoffs of every country with every other country when both of them cooperate.
+    """
+    return get_payoff_dataframe(population,  payoff_functions, distance_function, 'R')
+
+def get_temptations(population, payoff_functions, distance_function):
+    """
+    calculate the payoffs of every country with every other country when itself defects and  the others cooperate.
+    """
+    return get_payoff_dataframe(population,  payoff_functions, distance_function, 'T')
+
+def get_punishments(population, payoff_functions, distance_function):
+    """
+    calculate the payoffs of every country with every other country when both of them defect.
+    """
+    return get_payoff_dataframe(population,  payoff_functions, distance_function, 'P')
+    
+def get_suckers(population, payoff_functions, distance_function):
+    """
+    calculate the payoffs of every country with every other country when itself cooperates and the others defect.
+    """
+    return get_payoff_dataframe(population,  payoff_functions, distance_function, 'S')
+    
+    
+def get_self_reward(population, payoff_functions, distance_function):
+    """
+    calculate fitness, which every country gets from its own market.
+    """
+    for country in population:
+        country.d = distance_function(country.sqrt_area)
+    self_reward_dict = {country: payoff_functions['self_reward'](country) for country in population}
+    return pd.DataFrame.from_dict(self_reward_dict)
+
+def get_mean_rewards(population, payoff_functions, distance_function):
+    """
+    calculate the mean 
+    """ 
+    df = get_rewards(population, payoff_functions, distance_function)
+    return df.mean()
+
+def get_mean_temptations(population, payoff_functions, distance_function):
+    """
+    calculate the mean 
+    """
+    df = get_temptations(population, payoff_functions, distance_function)
+    return df.mean()    
+
+
+def get_mean_punishments(population, payoff_functions, distance_function):
+    """
+    calculate the mean 
+    """
+    df = get_punishments(population, payoff_functions, distance_function)
+    return df.mean()
+
+def get_mean_suckers(population, payoff_functions, distance_function):
+    """
+    calculate the mean 
+    """
+    df = get_suckers(population, payoff_functions, distance_function)
+    return df.mean()  
+
+
+def get_sd_rewards(population, payoff_functions, distance_function):
+    """
+    calculate the standard deviation
+    """
+    df = get_rewards(population, payoff_functions, distance_function)
+    return df.std()
+
+def get_sd_temptations(population, payoff_functions, distance_function):
+    """
+    calculate the standard deviation
+    """ 
+    df = get_temptations(population, payoff_functions, distance_function)
+    return df.std()    
+
+
+def get_sd_punishments(population, payoff_functions, distance_function):
+    """
+    calculate the standard deviation
+    """
+    df = get_punishments(population, payoff_functions, distance_function)
+    return df.std()
+
+def get_sd_suckers(population, payoff_functions, distance_function):
+    """
+    calculate the standard deviation
+    """
+    df = get_suckers(population, payoff_functions, distance_function)
+    return df.std()
     
     
     
+def get_mean_self_rewards(population, payoff_functions, distance_function):  
+    for country in population:
+        country.d = distance_function(country.sqrt_area)
     
+    return mean([payoff_functions['self_reward'](country) for country in population])
     
+def get_sd_self_rewards(population, payoff_functions, distance_function):
+    for country in population:
+        country.d = distance_function(country.sqrt_area)    
     
-    
-    
+    return stdev([payoff_functions['self_reward'](country) for country in population])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -23,7 +23,7 @@ class Country:
     
         # private attributes, they should only be changed with `change_strategy`
         self._strategy = None 
-        self._evolution = [] 
+        self._evolution = []
         
       
     def __str__(self):

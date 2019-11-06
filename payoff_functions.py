@@ -1,3 +1,4 @@
+import math as m
 
 # These functions are the suggested payoff_functions. That is, they 
 # calculate how much fitness a country should  get/lose by
@@ -7,7 +8,7 @@
 
 def selfreward(country):
     '''calculates how much reward a country gets from its own internal market'''
-    return country.m/country.sqrt_area # let SEBASTIAN check this
+    return (1-country.e)country.m / country.sqrt_area
 
 def reward(country, other, d):
     '''calculates how much reward would change fitness'''

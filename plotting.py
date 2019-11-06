@@ -211,7 +211,7 @@ def overal_C_and_D(tournament):
     
     return number_of_C, number_of_D
             
-def outcome_ratios_per_round(tournament, x_size, y_size):
+def outcome_ratios_per_round(tournament, x_size=10, y_size=10):
     array_dict = outcomes_dict_per_round(tournament)
     fractions_mutual_C = [num_c/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     fractions_mutual_D = [num_d/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
@@ -225,7 +225,7 @@ def outcome_ratios_per_round(tournament, x_size, y_size):
     plt.xlabel('Round number')
     plt.ylabel('Outcome ratios')
 
-def C_D_ratios_per_round(tournament, x_size, y_size):
+def C_D_ratios_per_round(tournament, x_size=10, y_size=10):
     array_dict = C_D_dict_per_round(tournament)
     fractions_c = [num_c/(num_c + num_d) for num_c, num_d in zip(array_dict[C], array_dict[D])]
 
@@ -337,13 +337,11 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
         plt.ylabel("Fitness Level", fontsize = 24)
         plt.tick_params(axis='both',labelsize=14)
 
-def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10):
+def fitness_history_sum_list(tournament, selecting=[], filtering = []):
     """
-    population fitness (summed) per round
+    return the fitness of all contries summed, in a list of rounds.
     """
 
-    fig, ax = plt.subplots(figsize =(x_size, y_size))
-    cmap = plt.get_cmap(cmap)
 
     if selecting:
         countries=selecting
@@ -354,6 +352,19 @@ def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Gr
 
     fitness_histories = [c.fitness_history for c in countries]
     ls = [sum(fitnesses) for fitnesses in zip(*fitness_histories)]
+    
+    return ls
+    
+
+def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10):
+    """
+    population fitness (summed) per round
+    """
+   
+    ls = fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
+
+    fig, ax = plt.subplots(figsize =(x_size, y_size))
+    cmap = plt.get_cmap(cmap)
 
     plt.plot(ls,c='black',linewidth=1)
     plt.title("Fitness of Whole Population", fontsize = 24)
@@ -361,10 +372,20 @@ def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Gr
     plt.ylabel("Fitness Level", fontsize = 24)
     plt.tick_params(axis='both',labelsize=14)   
 
-
-
-
+def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10):
+  
+    fitnes_history_ls = fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
     
+    ls = [fitnes_history_ls[i + 1] - fitnes_history_ls[i] for i in range(len(fitnes_history_ls)-1)] 
+
+    fig, ax = plt.subplots(figsize =(x_size, y_size))
+    cmap = plt.get_cmap(cmap)
+
+    plt.plot(ls,c='black',linewidth=1)
+    plt.title("Fitness Changes of Whole Population", fontsize = 24)
+    plt.xlabel("Number of Rounds", fontsize = 24)
+    plt.ylabel("Fitness Change", fontsize = 24)
+    plt.tick_params(axis='both',labelsize=14)     
     
     
 ### definitions by Sebastian

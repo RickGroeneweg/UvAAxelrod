@@ -142,11 +142,11 @@ def get_game_history(tournament, c1, c2):
         return zip(data['history_2'],data['history_1'])
     else:
         return zip(data['history_1'],data['history_2'])
-    
+
 def outcomes_dict_per_round(tournament):
     array_dict= {'Mutual_Cooperation': np.zeros((tournament.round,)), 'Mutual_Defection': np.zeros((tournament.round,)), 'Exploitation': np.zeros((tournament.round,))}
 
-    for country_1, country_2, data in tournament.graph.edges(data=True):     
+    for country_1, country_2 in tournament.graph.edges(data=False):     
         
         for round_num, (action_1, action_2) in enumerate(get_game_history(tournament, country_1, country_2)):
             if action_1 == action_2:

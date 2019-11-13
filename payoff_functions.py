@@ -8,7 +8,7 @@ import math as m
 
 def selfreward(country):
     '''calculates how much reward a country gets from its own internal market'''
-    return (1 - country.e)*country.m / country.d
+    return country.m / country.d
 
 def reward(country, other, d):
     '''calculates how much reward would change fitness'''

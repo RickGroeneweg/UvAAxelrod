@@ -3,7 +3,7 @@ import numpy as np
 from geopy.distance import distance
 import time
 
-from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat
+from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat, win_stay_lose_shift
 from .initialize_countries import *
 
 from itertools import combinations
@@ -26,7 +26,7 @@ class Tournament:
         payoff_functions=default_payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
         distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
         surveillance_penalty = True,
-        penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95, generous_tit_for_tat: 0.95}, # Ask sebastian value for generous-tit-for-tat
+        penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95, generous_tit_for_tat: 0.95, win_stay_lose_shift: 0.95}, # Ask sebastian value for generous-tit-for-tat
         noise = 0
     ):
         """
@@ -134,7 +134,7 @@ class Tournament:
             >>> tournament = Tournament(...)
             >>> tournament.init_strategies(china, cooperate)
         """
-        assert self.round == 0, f'The round number of this tournament should be 0 when strategies are initialized, but it is {self.round}'
+        assert self.round == 0
         
         if isinstance(countries, Country):
             countries = [countries]

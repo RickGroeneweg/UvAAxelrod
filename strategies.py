@@ -32,3 +32,12 @@ def generous_tit_for_tat(selfmoves, othermoves):
         # last time, oponent did not cooperate
         return np.random.choice([C, D], p=[0.3, 0.7])
 generous_tit_for_tat.name = 'generous_tit_for_tat'
+
+def win_stay_lose_shift(selfmoves, othermoves):
+    if selfmoves ==[]:
+        return C
+    elif othermoves[-1]==selfmoves[-1]:
+        return C
+    else:
+        return D
+win_stay_lose_shift.name = 'win_stay_lose_shift'

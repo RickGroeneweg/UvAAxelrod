@@ -231,8 +231,8 @@ def C_D_ratios_per_round(tournament, x_size=10, y_size=10):
 
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     plt.plot(fractions_c, color='black')
-    plt.xlabel('Round number')
-    plt.ylabel('Cooperation ratio')
+    plt.xlabel('Round number', fontsize=24)
+    plt.ylabel('Cooperation ratio', fontsize=24)
 
 def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size=10, y_size =23):
     
@@ -260,7 +260,7 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size=10, y_size =23)
     plt.ylabel('Market share', fontsize=24)
     plt.xlabel('Round number', fontsize=24)
     plt.tick_params(axis='both',labelsize=14)
-    plt.title('Evolution of Strategies in Heterogenous Populations', fontsize=24)
+    
 
 def draw_country_line(country, cmap, strategy_list): #need to add a color legend and color line option
 

@@ -225,6 +225,7 @@ capital_dict = {
     "Antigua and Barbuda": StJohns,
     "Argentina": BuenosAires,
     "Armenia": Yerevan,
+    "Austria": Vienna,
     "Australia": Canberra,
     "Bahrain": Manama,
     "Bangladesh": Dhaka,

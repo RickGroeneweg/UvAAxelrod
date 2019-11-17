@@ -91,6 +91,11 @@ class Tournament:
                   payoff_functions['S'](c2,c1,d))
             ST = (payoff_functions['S'](c1,c2,d), 
                   payoff_functions['T'](c2,c1,d))
+            
+            assert RR[0] <= TS[0], f'reward was greater than temptation for countries {c1.name} and {c2.name}'
+            assert RR[1] <= ST[1], f'reward was greater than temptation for countries {c1.name} and {c2.name}'
+            
+            
             # initialize all edges
             graph.add_edge(
                 c1, 

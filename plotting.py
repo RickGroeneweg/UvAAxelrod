@@ -211,7 +211,7 @@ def overal_C_and_D(tournament):
     
     return number_of_C, number_of_D
             
-def outcome_ratios_per_round(tournament, x_size = 20, y_size = 40):
+def outcome_ratios_per_round(tournament, x_size = 40, y_size = 10):
     array_dict = outcomes_dict_per_round(tournament)
     fractions_mutual_C = [num_c/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     fractions_mutual_D = [num_d/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
@@ -227,7 +227,7 @@ def outcome_ratios_per_round(tournament, x_size = 20, y_size = 40):
     plt.ylabel('Outcome ratios', fontsize=24)
     plt.tick_params(axis='both',labelsize=14)
 
-def C_D_ratios_per_round(tournament, x_size=40, y_size=20):
+def C_D_ratios_per_round(tournament, x_size=40, y_size=10):
     array_dict = C_D_dict_per_round(tournament)
     fractions_c = [num_c/(num_c + num_d) for num_c, num_d in zip(array_dict[C], array_dict[D])]
 
@@ -257,7 +257,7 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 
         row = tournament.strategy_list.index(last_strategy)
         matrix[row, last_evo:] += country.m
     
-    fig, ax = plt.subplots(figsize =(y_size, x_size))
+    fig, ax = plt.subplots(figsize =(x_size, y_size,))
     ax.stackplot(range(rounds+1), *matrix, labels=[s.name for s in tournament.strategy_list], colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
     plt.ylabel('Market share', fontsize=24)
@@ -373,7 +373,7 @@ def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Gr
     plt.ylabel("Fitness Level", fontsize = 24)
     plt.tick_params(axis='both',labelsize=14)   
 
-def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 40, y_size = 20):
+def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 40, y_size = 10):
   
     fitnes_history_ls = fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
     

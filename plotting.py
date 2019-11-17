@@ -211,21 +211,23 @@ def overal_C_and_D(tournament):
     
     return number_of_C, number_of_D
             
-def outcome_ratios_per_round(tournament, x_size=10, y_size=10):
+def outcome_ratios_per_round(tournament, x_size = 20, y_size = 40):
     array_dict = outcomes_dict_per_round(tournament)
     fractions_mutual_C = [num_c/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     fractions_mutual_D = [num_d/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     fractions_mutual_Expl = [num_expl/(num_c + num_d + num_expl) for num_c, num_d, num_expl in zip(array_dict['Mutual_Cooperation'], array_dict['Mutual_Defection'],array_dict['Exploitation'])]
     
     fig, ax = plt.subplots(figsize =(x_size, y_size))
+    
     plt.plot(fractions_mutual_C, label='Mutual Cooperation', color =(0.8,)*3)
     plt.plot(fractions_mutual_D, label='Mutual Defection', color =(0.2,)*3)
     plt.plot(fractions_mutual_Expl, label='Exploitation', color =(0.5,)*3)
-    plt.legend()
-    plt.xlabel('Round number')
-    plt.ylabel('Outcome ratios')
+    ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
+    plt.xlabel('Round number', fontsize=24)
+    plt.ylabel('Outcome ratios', fontsize=24)
+    plt.tick_params(axis='both',labelsize=14)
 
-def C_D_ratios_per_round(tournament, x_size=10, y_size=10):
+def C_D_ratios_per_round(tournament, x_size=40, y_size=20):
     array_dict = C_D_dict_per_round(tournament)
     fractions_c = [num_c/(num_c + num_d) for num_c, num_d in zip(array_dict[C], array_dict[D])]
 
@@ -233,8 +235,9 @@ def C_D_ratios_per_round(tournament, x_size=10, y_size=10):
     plt.plot(fractions_c, color='black')
     plt.xlabel('Round number', fontsize=24)
     plt.ylabel('Cooperation ratio', fontsize=24)
+    plt.tick_params(axis='both',labelsize=14)
 
-def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size=10, y_size =23):
+def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 20):
     
     rounds = rounds or tournament.round
     n_strategies = len(tournament.strategy_list)
@@ -309,7 +312,7 @@ def wholePopulation_fitnessList(countries, delta = False):
     else:
         return [0] + [(listOfFitnesses[i+1] - listOfFitnesses[i]) for i in range(len(listOfFitnesses)-1)]    
     
-def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10, delta = False, wholePopulation = False):
+def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 40, y_size = 20, delta = False, wholePopulation = False):
 
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     cmap = plt.get_cmap(cmap)
@@ -332,8 +335,7 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
             plt.annotate(country.name, xy=(len(country.fitness_history) - 0.5, (country.fitness_history[-1] - country.fitness_history[-2])))
     elif wholePopulation == True:
         plt.plot(wholePopulation_fitnessList(countries, delta = delta),c='black',linewidth=1)
-        plt.title("Change in Fitness of Whole Population", fontsize = 24)
-        plt.xlabel("Number of Rounds", fontsize = 24)
+        plt.xlabel("Round Number", fontsize = 24)
         plt.ylabel("Fitness Level", fontsize = 24)
         plt.tick_params(axis='both',labelsize=14)
 
@@ -356,7 +358,7 @@ def fitness_history_sum_list(tournament, selecting=[], filtering = []):
     return ls
     
 
-def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10):
+def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 40, y_size = 20):
     """
     population fitness (summed) per round
     """
@@ -367,12 +369,11 @@ def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Gr
     cmap = plt.get_cmap(cmap)
 
     plt.plot(ls,c='black',linewidth=1)
-    plt.title("Fitness of Whole Population", fontsize = 24)
-    plt.xlabel("Number of Rounds", fontsize = 24)
+    plt.xlabel("Round Number", fontsize = 24)
     plt.ylabel("Fitness Level", fontsize = 24)
     plt.tick_params(axis='both',labelsize=14)   
 
-def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 10, y_size = 10):
+def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 40, y_size = 20):
   
     fitnes_history_ls = fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
     
@@ -382,8 +383,7 @@ def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap
     cmap = plt.get_cmap(cmap)
 
     plt.plot(ls,c='black',linewidth=1)
-    plt.title("Fitness Changes of Whole Population", fontsize = 24)
-    plt.xlabel("Number of Rounds", fontsize = 24)
+    plt.xlabel("Round Number", fontsize = 24)
     plt.ylabel("Fitness Change", fontsize = 24)
     plt.tick_params(axis='both',labelsize=14)     
     

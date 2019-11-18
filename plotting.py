@@ -376,13 +376,19 @@ def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap
   
     fitnes_history_ls = fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
     
+    
     ls = [fitnes_history_ls[i + 1] - fitnes_history_ls[i] for i in range(len(fitnes_history_ls)-1)] 
 
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     cmap = plt.get_cmap(cmap)
 
+    print(ls)
+    
+    max_y = max(ls)*1.1
+    min_y = min(ls)*0.9
+    ax.set_ylim(bottom=min_y, top=max_y)
     plt.plot(ls,c='black',linewidth=1)
-    plt.title("Fitness Changes of Whole Population", fontsize = 24)
+    #plt.title("Fitness Changes of Whole Population", fontsize = 24)
     plt.xlabel("Number of Rounds", fontsize = 24)
     plt.ylabel("Fitness Change", fontsize = 24)
     plt.tick_params(axis='both',labelsize=14)     

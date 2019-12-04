@@ -382,7 +382,7 @@ def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     cmap = plt.get_cmap(cmap)
 
-    print(ls)
+    #print(ls)
     
     max_y = max(ls)*1.1
     min_y = min(ls)*0.9

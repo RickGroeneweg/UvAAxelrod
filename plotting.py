@@ -230,13 +230,15 @@ def outcome_ratios_per_round(tournament, x_size = 40, y_size = 10):
 def C_D_ratios_per_round(tournament, x_size=40, y_size=10):
     array_dict = C_D_dict_per_round(tournament)
     fractions_c = [num_c/(num_c + num_d) for num_c, num_d in zip(array_dict[C], array_dict[D])]
+    average_line = mean(fractions_c)
 
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     plt.plot(fractions_c, color='black')
+    plt.hlines(y=average_line, xmin = 0, xmax = tournament.round, color = (0.5,)*3, label = 'Average cooperation ratio')
     plt.xlabel('Round number', fontsize=24)
     plt.ylabel('Cooperation ratio', fontsize=24)
     plt.tick_params(axis='both',labelsize=14)
-
+    
 def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 20):
     
     rounds = rounds or tournament.round

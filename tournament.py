@@ -3,7 +3,7 @@ import numpy as np
 from geopy.distance import distance
 import time
 
-from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat
+from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat, win_stay_lose_shift
 from .initialize_countries import *
 
 from itertools import combinations
@@ -26,7 +26,7 @@ class Tournament:
         payoff_functions=default_payoff_functions, # rewards that countries get, defaults to the functions described in the paper.
         distance_function = lambda d: d, # defaults to just the identity, if one wanted that distances get less important the larger they are, one could use the sqrt.
         surveillance_penalty = True,
-        penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95, generous_tit_for_tat: 0.95}, # Ask sebastian value for generous-tit-for-tat
+        penalty_dict = {cooperate: 1, defect: 1, tit_for_tat: 0.95, generous_tit_for_tat: 0.95, win_stay_lose_shift: 0.95}, # Ask sebastian value for generous-tit-for-tat
         noise = 0
     ):
         """
@@ -45,7 +45,7 @@ class Tournament:
         self.noise = noise
         
         # Data from the simulations will be stored in an NetworkX-graph
-        self.graph = self.init_graph(countries, distance_function)
+        self.graph = self.init_graph(countries, distance_function, self.payoff_functions)
         
         # results of a the simulations
         self.fitness_results = np.zeros((len(self.countries()), max_rounds))
@@ -54,8 +54,9 @@ class Tournament:
         # state variables
         self.round = 0
         self.is_done = False
-        
-    def init_graph(self, countries, distance_function):
+       
+    @staticmethod
+    def init_graph(countries, distance_function, payoff_functions):
         """
         initialize the graph (form the NetworkX library), that is used to store
         data from the simulation. Nodes in this graph store countries, and edges
@@ -71,6 +72,7 @@ class Tournament:
         # add nodes to graph
         for country in countries:
             graph.add_node(country)
+            country.d = distance_function(country.sqrt_area)
             
         # add edges to graph
         # loop through all combinations of countries in the tournament.
@@ -81,14 +83,19 @@ class Tournament:
             # R: reward, P: punishment, T: temptation, S: sucker
             real_distance = distance(c1.location, c2.location).km
             d = distance_function(real_distance) if distance_function else real_distance
-            RR = (self.payoff_functions['R'](c1,c2,d), 
-                  self.payoff_functions['R'](c2,c1,d))
-            PP = (self.payoff_functions['R'](c1,c2,d), 
-                  self.payoff_functions['R'](c2,c1,d))
-            TS = (self.payoff_functions['T'](c1,c2,d), 
-                  self.payoff_functions['S'](c2,c1,d))
-            ST = (self.payoff_functions['S'](c1,c2,d), 
-                  self.payoff_functions['T'](c2,c1,d))
+            RR = (payoff_functions['R'](c1,c2,d), 
+                  payoff_functions['R'](c2,c1,d))
+            PP = (payoff_functions['P'](c1,c2,d), 
+                  payoff_functions['P'](c2,c1,d))
+            TS = (payoff_functions['T'](c1,c2,d), 
+                  payoff_functions['S'](c2,c1,d))
+            ST = (payoff_functions['S'](c1,c2,d), 
+                  payoff_functions['T'](c2,c1,d))
+            
+            assert RR[0] <= TS[0], f'reward was greater than temptation for countries {c1.name} and {c2.name}'
+            assert RR[1] <= ST[1], f'reward was greater than temptation for countries {c1.name} and {c2.name}'
+            
+            
             # initialize all edges
             graph.add_edge(
                 c1, 
@@ -132,7 +139,7 @@ class Tournament:
             >>> tournament = Tournament(...)
             >>> tournament.init_strategies(china, cooperate)
         """
-        assert self.round == 0, f'The round number of this tournament should be 0 when strategies are initialized, but it is {self.round}'
+        assert self.round == 0
         
         if isinstance(countries, Country):
             countries = [countries]
@@ -217,6 +224,7 @@ class Tournament:
         """
         
         country_list = list(self.countries())
+
         N = len(country_list)
         
         # randomly select a country that will lose it's strategy to the winning strategy
@@ -233,9 +241,10 @@ class Tournament:
             winning_country = 'random_mutation'
         else:
             # we select a winning strategy with the probabilites of 'how much fitness each strategy has'
-            fitness_scores = [country.fitness for country in country_list if country.fitness>0]
-            total_fitness = sum(fitness_scores)
-            probabilities = [fitness_scores[j]/total_fitness for j in range(N)] # errors if total fitness becomes negative...
+            fitness_scores = [country.fitness for country in country_list]
+            fitness_scores_non_neg = [max(0, fitness) for fitness in fitness_scores]
+            total_fitness = sum(fitness_scores_non_neg)
+            probabilities = [fitness_scores_non_neg[j]/total_fitness for j in range(N)] # errors if total fitness becomes negative...
             
             # select a random country, with probabilities by normalized fitnesses
             reproduce_idx = np.random.choice(range(N), p=probabilities)

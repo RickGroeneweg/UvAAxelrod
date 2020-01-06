@@ -43,6 +43,7 @@ def get_WTO_countries(year):
             df['i'].at[name], 
             sqrt_area_dict[name],
         )
+        
         countries.append(country)
         
     return countries
@@ -224,6 +225,7 @@ capital_dict = {
     "Antigua and Barbuda": StJohns,
     "Argentina": BuenosAires,
     "Armenia": Yerevan,
+    "Austria": Vienna,
     "Australia": Canberra,
     "Bahrain": Manama,
     "Bangladesh": Dhaka,

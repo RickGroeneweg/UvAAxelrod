@@ -234,11 +234,11 @@ def C_D_ratios_per_round(tournament, x_size=40, y_size=10):
 
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     plt.plot(fractions_c, color='black')
-    plt.hlines(y=average_line, xmin = 0, xmax = tournament.round, color = (0.5,)*3, label = 'Average cooperation ratio '+str(round(average_line, 2)))
-    plt.legend(fontsize=24)
-    plt.xlabel('Round number', fontsize=24)
-    plt.ylabel('Cooperation ratio', fontsize=24)
-    plt.tick_params(axis='both',labelsize=14)
+    plt.hlines(y=average_line, xmin = 0, xmax = tournament.round, color = (0.5,)*3, label='Average cooperation ratio: '+str(average_line.round(2)))
+    plt.legend(fontsize=36)
+    plt.xlabel('Round number', fontsize=36)
+    plt.ylabel('Cooperation ratio', fontsize=36)
+    plt.tick_params(axis='both',labelsize=24)
     
 def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 20):
     
@@ -262,10 +262,10 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 
     
     fig, ax = plt.subplots(figsize =(x_size, y_size,))
     ax.stackplot(range(rounds+1), *matrix, labels=[s.name for s in tournament.strategy_list], colors= colors) #this needs to be adjusted for the number of strategies
-    ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize='xx-large')
-    plt.ylabel('Market share', fontsize=24)
-    plt.xlabel('Round number', fontsize=24)
-    plt.tick_params(axis='both',labelsize=14)
+    ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize=36)
+    plt.ylabel('Market share', fontsize=36)
+    plt.xlabel('Round number', fontsize=36)
+    plt.tick_params(axis='both',labelsize=24)
     
 
 def draw_country_line(country, cmap, strategy_list): #need to add a color legend and color line option
@@ -385,6 +385,8 @@ def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap
 
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     cmap = plt.get_cmap(cmap)
+
+    print(ls)
     
     max_y = max(ls)*1.1
     min_y = min(ls)*0.9

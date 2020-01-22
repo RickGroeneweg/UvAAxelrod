@@ -9,6 +9,7 @@ from .enums import Action, C, D
 import pandas as pd
 from .tournament import Tournament
 from statistics import mean, stdev
+from functools import lru_cache
 
 
 
@@ -342,6 +343,7 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
         plt.ylabel("Fitness Level", fontsize = 24)
         plt.tick_params(axis='both',labelsize=14)
 
+@lru_cache()
 def fitness_history_sum_list(tournament, selecting=[], filtering = []):
     """
     return the fitness of all contries summed, in a list of rounds.

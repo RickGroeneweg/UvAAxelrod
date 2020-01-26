@@ -343,32 +343,21 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
         plt.ylabel("Fitness Level", fontsize = 24)
         plt.tick_params(axis='both',labelsize=14)
 
-@lru_cache()
-def fitness_history_sum_list(tournament, selecting=[], filtering = []):
-    """
-    return the fitness of all contries summed, in a list of rounds.
-    """
 
 
-    if selecting:
-        countries=selecting
-    elif filtering:
-        countries = [country for country in tournament.countries if not country in filtering]
-    else:
-        countries = list(tournament.countries())
-
-    fitness_histories = [c.fitness_history for c in countries]
-    ls = [sum(fitnesses) for fitnesses in zip(*fitness_histories)]
-    
-    return ls
     
 
-def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 40, y_size = 20):
+def draw_population_fitness(tournament, 
+                            selecting=[], 
+                            filtering = [], 
+                            cmap = 'Greys_r', 
+                            x_size = 40, 
+                            y_size = 20
+                            ):
     """
     population fitness (summed) per round
     """
-   
-    ls = fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
+    ls = tournament.summed_fitness_history#fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
 
     fig, ax = plt.subplots(figsize =(x_size, y_size))
     cmap = plt.get_cmap(cmap)
@@ -380,7 +369,7 @@ def draw_population_fitness(tournament, selecting=[], filtering = [], cmap = 'Gr
 
 def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap = 'Greys_r', x_size = 40, y_size = 10):
   
-    fitnes_history_ls = fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
+    fitnes_history_ls = tournament.summed_fitness_history #fitness_history_sum_list(tournament, selecting=selecting, filtering = filtering)
     
     
     ls = [fitnes_history_ls[i + 1] - fitnes_history_ls[i] for i in range(len(fitnes_history_ls)-1)] 

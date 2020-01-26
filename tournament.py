@@ -54,6 +54,8 @@ class Tournament:
         # state variables
         self.round = 0
         self.is_done = False
+        
+        self.summed_fitness_history = None
        
     @staticmethod
     def init_graph(countries, distance_function, payoff_functions):
@@ -395,6 +397,24 @@ class Tournament:
                 return False
         return True
 
+    def fitness_history_sum_list(self, selecting=[], filtering = []):
+        """
+        return the fitness of all contries summed, in a list of rounds.
+        """
+    
+    
+        if selecting:
+            countries=selecting
+        elif filtering:
+            countries = [country for country in self.countries if not country in filtering]
+        else:
+            countries = list(self.countries())
+    
+        fitness_histories = [c.fitness_history for c in countries]
+        ls = [sum(fitnesses) for fitnesses in zip(*fitness_histories)]
+        
+        self.summed_fitness_history = ls
+
             
     #Todo: remove initial fitness
     @classmethod
@@ -452,6 +472,9 @@ class Tournament:
         tournament.init_fitness(init_fitnes_as_m=init_fitnes_as_m)
         
         tournament.play(self_reward, playing_each_other, nr_strategy_changes, mutation_rate)
+        
+        
+        tournament.fitness_history_sum_list()
         
         return tournament
         
